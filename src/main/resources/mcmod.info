@@ -1,0 +1,16 @@
+[
+{
+  "modid": "a_and_rs",
+  "name": "Avaritita and Refined Storage",
+  "description": "A mod that adds Avaritia support to Refined Storage",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["ExpensiveKoala"],
+  "credits": "The Avaritia and Refined Storage devs for the amazing mods.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
