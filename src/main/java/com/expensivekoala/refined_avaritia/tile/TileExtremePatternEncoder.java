@@ -1,4 +1,4 @@
-package com.expensivekoala.a_and_rs.tile;
+package com.expensivekoala.refined_avaritia.tile;
 
 import com.raoulvdberge.refinedstorage.tile.TileBase;
 

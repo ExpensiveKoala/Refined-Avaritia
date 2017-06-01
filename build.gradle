@@ -13,8 +13,8 @@ apply plugin: 'maven'
 
 
 version = "1.0"
-group= "com.expensivekoala.a_and_rs" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "a_and_rs"
+group= "com.expensivekoala.refined_avaritia" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "refined_avaritia"
 
 sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
 compileJava {

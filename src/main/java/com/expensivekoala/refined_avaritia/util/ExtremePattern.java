@@ -1,9 +1,8 @@
-package com.expensivekoala.a_and_rs.util;
+package com.expensivekoala.refined_avaritia.util;
 
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContainer;
 import com.raoulvdberge.refinedstorage.apiimpl.util.Comparer;
-import com.raoulvdberge.refinedstorage.item.ItemPattern;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;

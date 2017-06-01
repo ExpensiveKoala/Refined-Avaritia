@@ -1,4 +1,4 @@
-package com.expensivekoala.a_and_rs.proxy;
+package com.expensivekoala.refined_avaritia.proxy;
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;

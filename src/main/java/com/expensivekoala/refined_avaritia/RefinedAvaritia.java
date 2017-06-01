@@ -1,6 +1,6 @@
-package com.expensivekoala.a_and_rs;
+package com.expensivekoala.refined_avaritia;
 
-import com.expensivekoala.a_and_rs.proxy.CommonProxy;
+import com.expensivekoala.refined_avaritia.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -8,18 +8,18 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = AvaritiaAndRefinedStorage.MODID, name = AvaritiaAndRefinedStorage.MODNAME ,version = AvaritiaAndRefinedStorage.VERSION, dependencies = AvaritiaAndRefinedStorage.DEPENDENCIES)
-public class AvaritiaAndRefinedStorage {
-    public static final String MODID = "a_and_rs";
-    public static final String MODNAME = "Avaritia and Refined Storage";
+@Mod(modid = RefinedAvaritia.MODID, name = RefinedAvaritia.MODNAME ,version = RefinedAvaritia.VERSION, dependencies = RefinedAvaritia.DEPENDENCIES)
+public class RefinedAvaritia {
+    public static final String MODID = "refined_avaritia";
+    public static final String MODNAME = "Refined Avaritia";
     public static final String VERSION = "1.0";
     public static final String DEPENDENCIES = "required-after:refinedstorage;required-after:avaritia";
 
-    @SidedProxy(clientSide = "com.expensivekoala.a_and_rs.proxy.ClientProxy", serverSide = "com.expensivekoala.a_and_rs.proxy.CommonProxy")
+    @SidedProxy(clientSide = "com.expensivekoala.refined_avaritia.proxy.ClientProxy", serverSide = "com.expensivekoala.refined_avaritia.proxy.CommonProxy")
     public static CommonProxy proxy;
 
     @Mod.Instance
-    public static AvaritiaAndRefinedStorage instance;
+    public static RefinedAvaritia instance;
 
     public static Logger logger;
 
