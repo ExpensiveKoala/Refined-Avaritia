@@ -16,7 +16,7 @@ public class ContainerExtremeCrafter extends ContainerBase {
             addSlotToContainer(new SlotItemHandler(crafter.getUpgrades(), i, 187, 6 + i * 18));
 
         for(int i = 0; i < 9; i++)
-            addSlotToContainer(new SlotSpecimen(crafter.getFilter(), i, 8 + 18 * i, 20));
+            addSlotToContainer(new SlotItemHandler(crafter.getPatternItems(), i, 8 + 18 * i, 20));
 
         addPlayerInventory(8, 55);
     }
