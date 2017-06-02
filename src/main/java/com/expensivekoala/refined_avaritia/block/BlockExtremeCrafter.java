@@ -3,10 +3,16 @@ package com.expensivekoala.refined_avaritia.block;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
 import com.expensivekoala.refined_avaritia.tile.TileExtremeCrafter;
+import com.raoulvdberge.refinedstorage.RS;
 import com.raoulvdberge.refinedstorage.block.BlockNode;
 import com.raoulvdberge.refinedstorage.block.EnumPlacementType;
+import com.raoulvdberge.refinedstorage.item.ItemBlockBase;
+import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -16,13 +22,16 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class BlockExtremeCrafter extends BlockNode {
+public class BlockExtremeCrafter extends Block implements ITileEntityProvider{
 
 
     public BlockExtremeCrafter() {
-        super("extreme_crafter");
-        setRegistryName(RefinedAvaritia.MODID, "extreme_crafter");
+        super(Material.ROCK);
+        setHardness(1.9f);
+        this.setRegistryName(RefinedAvaritia.MODID, "extreme_crafter");
+        this.setCreativeTab(RS.INSTANCE.tab);
     }
+
 
     @Override
     public String getUnlocalizedName() {
@@ -43,8 +52,12 @@ public class BlockExtremeCrafter extends BlockNode {
         return true;
     }
 
+    public ItemBlock createItem() {
+        return new ItemBlockBase(this, null, false);
+    }
+
     @Override
-    public EnumPlacementType getPlacementType() {
-        return null;
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
+        return new TileExtremeCrafter();
     }
 }

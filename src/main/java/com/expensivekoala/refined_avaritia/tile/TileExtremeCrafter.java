@@ -1,5 +1,6 @@
 package com.expensivekoala.refined_avaritia.tile;
 
+import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.raoulvdberge.refinedstorage.RSUtils;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContainer;
@@ -134,7 +135,7 @@ public class TileExtremeCrafter extends TileNode implements ICraftingPatternCont
                     .forEach(network::cancelCraftingTask);
         }
 
-        network.rebuildPatterns();
+        //network.rebuildPatterns();
     }
 
     @Override
@@ -168,11 +169,11 @@ public class TileExtremeCrafter extends TileNode implements ICraftingPatternCont
     @Override
     public int getEnergyUsage()
     {
-        int usage = 0;
+        int usage = RefinedAvaritia.instance.config.extremeCrafterUsage;
 
         for (int i = 0; i < patterns.getSlots(); i++) {
             if(patterns.getStackInSlot(i) != null)
-                usage += 1;
+                usage += RefinedAvaritia.instance.config.extremeCrafterUsagePerPattern;
         }
 
         return usage;

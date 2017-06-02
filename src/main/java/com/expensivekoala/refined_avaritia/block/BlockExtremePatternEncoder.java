@@ -3,11 +3,17 @@ package com.expensivekoala.refined_avaritia.block;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
+import com.raoulvdberge.refinedstorage.RS;
 import com.raoulvdberge.refinedstorage.block.BlockBase;
 import com.raoulvdberge.refinedstorage.block.EnumPlacementType;
+import com.raoulvdberge.refinedstorage.item.ItemBlockBase;
+import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -18,11 +24,13 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BlockExtremePatternEncoder extends BlockBase {
+public class BlockExtremePatternEncoder extends Block implements ITileEntityProvider{
 
     public BlockExtremePatternEncoder() {
-        super("extreme_pattern_encoder");
+        super(Material.ROCK);
+        setHardness(1.9f);
         setRegistryName(RefinedAvaritia.MODID, "extreme_pattern_encoder");
+        setCreativeTab(RS.INSTANCE.tab);
     }
 
     @Override
@@ -56,8 +64,12 @@ public class BlockExtremePatternEncoder extends BlockBase {
         return true;
     }
 
+    public ItemBlock createItem() {
+        return new ItemBlockBase(this, null, false);
+    }
+
     @Override
-    public EnumPlacementType getPlacementType() {
-        return null;
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
+        return new TileExtremePatternEncoder();
     }
 }

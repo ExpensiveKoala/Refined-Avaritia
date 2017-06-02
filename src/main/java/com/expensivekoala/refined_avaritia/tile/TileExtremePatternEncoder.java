@@ -2,6 +2,8 @@ package com.expensivekoala.refined_avaritia.tile;
 
 import com.expensivekoala.refined_avaritia.RAItems;
 import com.expensivekoala.refined_avaritia.gui.GuiExtremePatternEncoder;
+import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
+import com.expensivekoala.refined_avaritia.util.ItemHandlerPhantom;
 import com.raoulvdberge.refinedstorage.RSUtils;
 import com.raoulvdberge.refinedstorage.inventory.ItemHandlerBasic;
 import com.raoulvdberge.refinedstorage.inventory.ItemValidatorBasic;
@@ -9,7 +11,13 @@ import com.raoulvdberge.refinedstorage.tile.TileBase;
 import com.raoulvdberge.refinedstorage.tile.data.ITileDataConsumer;
 import com.raoulvdberge.refinedstorage.tile.data.ITileDataProducer;
 import com.raoulvdberge.refinedstorage.tile.data.TileDataParameter;
+import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.EnumFacing;
@@ -39,7 +47,8 @@ public class TileExtremePatternEncoder extends TileBase {
     });
 
     private ItemHandlerBasic patterns = new ItemHandlerBasic(2, this, new ItemValidatorBasic(RAItems.PATTERN));
-    private ItemHandlerBasic recipe = new ItemHandlerBasic(9 * 9, this);
+    private ItemHandlerPhantom recipe = new ItemHandlerPhantom(9 * 9, this, false);
+    private ItemHandlerPhantom recipeOutput = new ItemHandlerPhantom(1, this, true);
 
     private boolean oredictPattern;
 
@@ -70,11 +79,48 @@ public class TileExtremePatternEncoder extends TileBase {
     }
 
     public void onCreatePattern() {
+        if(canCreatePattern()) {
+            patterns.extractItem(0,1,false);
 
+            ItemStack pattern = new ItemStack(RAItems.PATTERN);
+
+            ItemExtremePattern.setOredict(pattern, oredictPattern);
+
+            for (int i = 0; i < 81; i++) {
+                ItemStack ingredient = recipe.getStackInSlot(i);
+
+                if(ingredient != null) {
+                    ItemExtremePattern.setSlot(pattern, i, ingredient);
+                }
+            }
+
+            patterns.setStackInSlot(1, pattern);
+        }
     }
 
     public boolean canCreatePattern() {
-        return true;
+        return recipeOutput.getStackInSlot(0) != null && patterns.getStackInSlot(1) == null && patterns.getStackInSlot(0) != null;
+    }
+
+    public void onContentsChanged() {
+        recipeOutput.setStackInSlot(0, ExtremeCraftingManager.getInstance().findMatchingRecipe(getCrafting(recipe), getWorld()));
+        markDirty();
+    }
+
+    public static InventoryCrafting getCrafting(IItemHandler recipe) {
+        Container craftingContainer = new Container() {
+            @Override
+            public boolean canInteractWith(EntityPlayer player) {
+                return false;
+            }
+        };
+        InventoryCrafting crafting = new InventoryCrafting(craftingContainer, 9, 9);
+
+        for (int i = 0; i < recipe.getSlots(); i++) {
+            crafting.setInventorySlotContents(i, recipe.getStackInSlot(i));
+        }
+
+        return crafting;
     }
 
     public IItemHandler getPatterns() {
@@ -84,6 +130,8 @@ public class TileExtremePatternEncoder extends TileBase {
     public IItemHandler getRecipe() {
         return recipe;
     }
+
+    public IItemHandler getRecipeOutput() { return recipeOutput; }
 
     @Override
     public IItemHandler getDrops() {
@@ -98,7 +146,7 @@ public class TileExtremePatternEncoder extends TileBase {
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return (T) patterns
+            return (T) patterns;
         }
         return super.getCapability(capability, facing);
     }

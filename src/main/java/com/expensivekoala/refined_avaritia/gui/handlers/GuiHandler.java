@@ -30,9 +30,11 @@ public class GuiHandler implements IGuiHandler {
         if(ID == EXTREME_CRAFTER_GUI)
             return new GuiExtremeCrafter(new ContainerExtremeCrafter((TileExtremeCrafter)world.getTileEntity(new BlockPos(x, y, z)), player),
                     (TileExtremeCrafter) world.getTileEntity(new BlockPos(x, y, z)));
-        else if(ID == EXTREME_PATTERN_ENCODER_GUI)
-            return new GuiExtremePatternEncoder(new ContainerExtremePatternEncoder((TileExtremePatternEncoder)world.getTileEntity(new BlockPos(x, y, z)), player),
+        else if(ID == EXTREME_PATTERN_ENCODER_GUI) {
+            System.out.println(world.getTileEntity(new BlockPos(x, y, z)) + " : " + x + " " + y + " " + z);
+            return new GuiExtremePatternEncoder(new ContainerExtremePatternEncoder((TileExtremePatternEncoder) world.getTileEntity(new BlockPos(x, y, z)), player),
                     (TileExtremePatternEncoder) world.getTileEntity(new BlockPos(x, y, z)));
+        }
         return null;
     }
 }

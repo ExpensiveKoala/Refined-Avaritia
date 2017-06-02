@@ -1,18 +1,25 @@
 package com.expensivekoala.refined_avaritia.util;
 
+import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContainer;
+import com.raoulvdberge.refinedstorage.apiimpl.API;
+import com.raoulvdberge.refinedstorage.apiimpl.autocrafting.registry.CraftingTaskFactory;
 import com.raoulvdberge.refinedstorage.apiimpl.util.Comparer;
+import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
+import morph.avaritia.recipe.extreme.ExtremeShapedOreRecipe;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ExtremePattern implements ICraftingPattern {
 
@@ -37,27 +44,101 @@ public class ExtremePattern implements ICraftingPattern {
         }, 9, 9);
 
         for (int i = 0; i < 81; i++) {
+            ItemStack slot = ItemExtremePattern.getSlot(stack, i);
+            inputs.add(slot);
+            inv.setInventorySlotContents(i, slot);
+        }
 
+        recipe = (IRecipe)ExtremeCraftingManager.getInstance().getRecipeList().stream().filter(r -> ((IRecipe)r).matches(inv, world)).findFirst().orElse(null);
+        if(recipe != null) {
+            ItemStack output = recipe.getCraftingResult(inv);
+            if(output != null) {
+                boolean shapedOre = recipe instanceof ExtremeShapedOreRecipe;
+                outputs.add(Comparer.stripTags(output.copy()));
+
+                if(isOredict() && shapedOre) {
+                    Object[] inputs = new Object[0];
+                    if(shapedOre) {
+                        inputs = ((ExtremeShapedOreRecipe)recipe).getInput();
+                    } else {
+                        try {
+                            inputs = (Object[])recipe.getClass().getMethod("getInput").invoke(recipe);
+                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    for (Object input : inputs) {
+                        if(input == null) {
+                            oreInputs.add(Collections.emptyList());
+                        } else if (input instanceof ItemStack) {
+                            oreInputs.add(Collections.singletonList(Comparer.stripTags((ItemStack)input).copy()));
+                        } else {
+                            List<ItemStack> cleaned = new LinkedList<>();
+                            for (ItemStack in : (List<ItemStack>)input) {
+                                cleaned.add(Comparer.stripTags(in.copy()));
+                            }
+
+                            oreInputs.add(cleaned);
+                        }
+                    }
+                }
+
+                for(ItemStack remaining : recipe.getRemainingItems(inv)) {
+                    if (remaining != null) {
+                        byproducts.add(Comparer.stripTags(remaining.copy()));
+                    }
+                }
+            }
+        }
+
+        if(oreInputs.isEmpty()) {
+            for(ItemStack input : inputs) {
+                if(input == null) {
+                    oreInputs.add(Collections.emptyList());
+                } else if(isOredict()) {
+                    int[] ids = OreDictionary.getOreIDs(input);
+                    if(ids == null || ids.length == 0) {
+                        oreInputs.add(Collections.singletonList(Comparer.stripTags(input)));
+                    } else {
+                        List<ItemStack> oredict =
+                                Arrays.stream(ids)
+                                        .mapToObj(OreDictionary::getOreName)
+                                        .map(OreDictionary::getOres)
+                                        .flatMap(List::stream)
+                                        .map(ItemStack::copy)
+                                        .map(Comparer::stripTags)
+                                        .map(s -> {
+                                            s.stackSize = input.stackSize;
+                                            return s;
+                                        })
+                                        .collect(Collectors.toList());
+                        // Add original stack as first, should prevent some issues
+                        oredict.add(0, Comparer.stripTags(input.copy()));
+                        oreInputs.add(oredict);
+                    }
+                } else {
+                    oreInputs.add(Collections.singletonList(Comparer.stripTags(input)));
+                }
+            }
         }
     }
 
     @Override
     public ICraftingPatternContainer getContainer()
         {
-            return null;
+            return container;
         }
 
     @Override
     public ItemStack getStack()
         {
-            return null;
+            return stack;
         }
 
     @Override
-    public boolean isValid()
-        {
-            return false;
-        }
+    public boolean isValid() {
+        return inputs.stream().filter(Objects::nonNull).count() > 0 && !outputs.isEmpty();
+    }
 
     @Override
     public boolean isProcessing()
@@ -68,61 +149,112 @@ public class ExtremePattern implements ICraftingPattern {
     @Override
     public boolean isOredict()
         {
-            return false;
+            return ItemExtremePattern.isOredict(stack);
         }
 
     @Override
     public List<ItemStack> getInputs()
         {
-            return null;
+            return inputs;
         }
 
     @Override
     public List<List<ItemStack>> getOreInputs()
         {
-            return null;
+            return oreInputs;
         }
 
     @Nullable
     @Override
     public List<ItemStack> getOutputs(ItemStack[] itemStacks)
-        {
+    {
+        List<ItemStack> outputs = new ArrayList<>();
+
+        InventoryCrafting inv = new InventoryCrafting(new Container() {
+            @Override
+            public boolean canInteractWith(EntityPlayer playerIn) {
+                return false;
+            }
+        }, 9, 9);
+
+        for (int i = 0; i < 81; i++) {
+            inv.setInventorySlotContents(i, itemStacks[i]);
+        }
+
+        ItemStack cleaned = recipe.getCraftingResult(inv);
+        if(cleaned == null) {
             return null;
         }
+        outputs.add(cleaned.copy());
+
+        return outputs;
+
+    }
 
     @Override
     public List<ItemStack> getOutputs()
         {
-            return null;
+            return outputs;
         }
 
     @Override
     public List<ItemStack> getByproducts(ItemStack[] itemStacks)
-        {
-            return null;
+    {
+        List<ItemStack> byproducts = new ArrayList<>();
+
+        InventoryCrafting inv = new InventoryCrafting(new Container() {
+            @Override
+            public boolean canInteractWith(EntityPlayer player) {
+                return false;
+            }
+        }, 9, 9);
+
+        for (int i = 0; i < 81; ++i) {
+            inv.setInventorySlotContents(i, itemStacks[i]);
         }
+
+        for (ItemStack remaining : recipe.getRemainingItems(inv)) {
+            if (remaining != null) {
+                byproducts.add(remaining.copy());
+            }
+        }
+        return byproducts;
+    }
 
     @Override
     public List<ItemStack> getByproducts()
         {
-            return null;
+            return byproducts;
         }
 
     @Override
     public String getId()
         {
-            return null;
+            return CraftingTaskFactory.ID;
         }
 
     @Override
     public int getQuantityPerRequest(ItemStack itemStack, int i)
-        {
-            return 0;
+    {
+        int quantity = 0;
+        itemStack = Comparer.stripTags(itemStack.copy());
+        for(ItemStack output : outputs) {
+            if(API.instance().getComparer().isEqual(itemStack, output, i)) {
+                quantity += output.stackSize;
+            }
         }
+        return quantity;
+    }
 
     @Override
     public ItemStack getActualOutput(ItemStack itemStack, int i)
-        {
-            return null;
+    {
+        itemStack = Comparer.stripTags(itemStack.copy());
+        for(ItemStack output : outputs) {
+            if(API.instance().getComparer().isEqual(itemStack, output, i)) {
+                return output.copy();
+            }
         }
+        return null;
+    }
 }

@@ -1,11 +1,14 @@
 package com.expensivekoala.refined_avaritia;
 
 import com.expensivekoala.refined_avaritia.proxy.CommonProxy;
+import com.expensivekoala.refined_avaritia.util.Configs;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = RefinedAvaritia.MODID, name = RefinedAvaritia.MODNAME ,version = RefinedAvaritia.VERSION, dependencies = RefinedAvaritia.DEPENDENCIES)
@@ -23,8 +26,12 @@ public class RefinedAvaritia {
 
     public static Logger logger;
 
+    public Configs config;
+    public SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        config = new Configs(event.getSuggestedConfigurationFile());
         logger = event.getModLog();
         proxy.preInit(event);
     }
