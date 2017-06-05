@@ -18,7 +18,6 @@ public class ClientProxy extends CommonProxy {
         ModelLoader.setCustomModelResourceLocation(RAItems.PATTERN, 0, new ModelResourceLocation("refined_avaritia:pattern", "inventory"));
 
         //ItemBlocks
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(RABlocks.EXTREME_CRAFTER), 0, new ModelResourceLocation("refined_avaritia:extreme_crafter", "inventory"));
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(RABlocks.EXTREME_PATTERN_ENCODER), 0, new ModelResourceLocation("refined_avaritia:extreme_pattern_encoder", "inventory"));
     }
 }

@@ -4,10 +4,10 @@ import com.expensivekoala.refined_avaritia.RABlocks;
 import com.expensivekoala.refined_avaritia.RAItems;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
+import com.expensivekoala.refined_avaritia.network.MessageClearExtremePattern;
 import com.expensivekoala.refined_avaritia.network.MessageCreateExtremePattern;
-import com.expensivekoala.refined_avaritia.tile.TileExtremeCrafter;
+import com.expensivekoala.refined_avaritia.network.MessageSetOredictExtremePattern;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
-import net.minecraft.block.Block;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -19,14 +19,12 @@ public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e)
     {
         RefinedAvaritia.instance.network.registerMessage(MessageCreateExtremePattern.class, MessageCreateExtremePattern.class, 0, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageClearExtremePattern.class, MessageClearExtremePattern.class, 1, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageSetOredictExtremePattern.class, MessageSetOredictExtremePattern.class, 2, Side.SERVER);
 
         NetworkRegistry.INSTANCE.registerGuiHandler(RefinedAvaritia.instance, new GuiHandler());
 
-        GameRegistry.registerTileEntity(TileExtremeCrafter.class, RefinedAvaritia.MODID + ":extreme_crafter");
         GameRegistry.registerTileEntity(TileExtremePatternEncoder.class, RefinedAvaritia.MODID + ":extreme_pattern_encoder");
-
-        GameRegistry.register(RABlocks.EXTREME_CRAFTER);
-        GameRegistry.register(RABlocks.EXTREME_CRAFTER.createItem());
 
         GameRegistry.register(RABlocks.EXTREME_PATTERN_ENCODER);
         GameRegistry.register(RABlocks.EXTREME_PATTERN_ENCODER.createItem());

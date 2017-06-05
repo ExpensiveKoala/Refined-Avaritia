@@ -1,11 +1,16 @@
 package com.expensivekoala.refined_avaritia.gui;
 
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
+import com.expensivekoala.refined_avaritia.network.MessageClearExtremePattern;
+import com.expensivekoala.refined_avaritia.network.MessageCreateExtremePattern;
+import com.expensivekoala.refined_avaritia.network.MessageSetOredictExtremePattern;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
 import com.raoulvdberge.refinedstorage.gui.GuiBase;
 import com.raoulvdberge.refinedstorage.tile.data.TileDataManager;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 
 import java.io.IOException;
@@ -21,7 +26,7 @@ public class GuiExtremePatternEncoder extends GuiBase{
 
     @Override
     public void init(int x, int y) {
-        oredictPattern = addCheckBox(x + 175, y + 162, t("misc.refined_avaritia:oredict"), TileExtremePatternEncoder.OREDICT_PATTERN.getValue());
+        oredictPattern = addCheckBox(x + 175, y + 156, t("misc.refined_avaritia:oredict"), false);
     }
 
     @Override
@@ -42,13 +47,23 @@ public class GuiExtremePatternEncoder extends GuiBase{
         super.actionPerformed(button);
 
         if(button == oredictPattern) {
-            TileDataManager.setParameter(TileExtremePatternEncoder.OREDICT_PATTERN, oredictPattern.isChecked());
+            RefinedAvaritia.instance.network.sendToServer(new MessageSetOredictExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), oredictPattern.isChecked()));
         }
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        if(isOverClear(mouseX - guiLeft, mouseY - guiTop)) {
+            RefinedAvaritia.instance.network.sendToServer(new MessageClearExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ()));
+
+            mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+        } else if(isOverCreatePattern(mouseX - guiLeft, mouseY - guiTop)) {
+            RefinedAvaritia.instance.network.sendToServer(new MessageCreateExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ()));
+
+            mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+        }
     }
 
     @Override
@@ -64,7 +79,7 @@ public class GuiExtremePatternEncoder extends GuiBase{
         if(tile != null && !tile.canCreatePattern())
             ty = 2;
 
-        drawTexture(x + 200, y + 58, 241, ty * 16, 16, 16);
+        drawTexture(x + 199, y + 57, 240, ty * 16, 16, 16);
     }
 
     @Override

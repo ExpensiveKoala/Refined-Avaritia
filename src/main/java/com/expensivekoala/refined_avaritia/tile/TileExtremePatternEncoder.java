@@ -3,7 +3,6 @@ package com.expensivekoala.refined_avaritia.tile;
 import com.expensivekoala.refined_avaritia.RAItems;
 import com.expensivekoala.refined_avaritia.gui.GuiExtremePatternEncoder;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
-import com.expensivekoala.refined_avaritia.util.ItemHandlerPhantom;
 import com.raoulvdberge.refinedstorage.RSUtils;
 import com.raoulvdberge.refinedstorage.inventory.ItemHandlerBasic;
 import com.raoulvdberge.refinedstorage.inventory.ItemValidatorBasic;
@@ -15,7 +14,6 @@ import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,32 +26,14 @@ import net.minecraftforge.items.IItemHandler;
 public class TileExtremePatternEncoder extends TileBase {
     private static final String NBT_OREDICT_PATTERN = "OredictPattern";
 
-    public static final TileDataParameter<Boolean> OREDICT_PATTERN = new TileDataParameter<>(DataSerializers.BOOLEAN, false, new ITileDataProducer<Boolean, TileExtremePatternEncoder>() {
-        @Override
-        public Boolean getValue(TileExtremePatternEncoder tile) {
-            return tile.oredictPattern;
-        }
-    }, new ITileDataConsumer<Boolean, TileExtremePatternEncoder>() {
-        @Override
-        public void setValue(TileExtremePatternEncoder tile, Boolean value) {
-            tile.oredictPattern = value;
-
-            tile.markDirty();
-        }
-    }, parameter -> {
-        if (Minecraft.getMinecraft().currentScreen instanceof GuiExtremePatternEncoder) {
-            ((GuiExtremePatternEncoder) Minecraft.getMinecraft().currentScreen).updateOredictPattern(parameter.getValue());
-        }
-    });
-
     private ItemHandlerBasic patterns = new ItemHandlerBasic(2, this, new ItemValidatorBasic(RAItems.PATTERN));
-    private ItemHandlerPhantom recipe = new ItemHandlerPhantom(9 * 9, this, false);
-    private ItemHandlerPhantom recipeOutput = new ItemHandlerPhantom(1, this, true);
+    private ItemHandlerBasic recipe = new ItemHandlerBasic(9 * 9, this);
+    private ItemHandlerBasic recipeOutput = new ItemHandlerBasic(1, this);
 
     private boolean oredictPattern;
 
     public TileExtremePatternEncoder() {
-        dataManager.addWatchedParameter(OREDICT_PATTERN);
+        oredictPattern = false;
     }
 
     @Override
@@ -72,10 +52,9 @@ public class TileExtremePatternEncoder extends TileBase {
     public void read(NBTTagCompound tag) {
         super.read(tag);
         RSUtils.readItems(patterns, 0, tag);
-        RSUtils.writeItems(recipe, 1, tag);
-        if(tag.hasKey(NBT_OREDICT_PATTERN)) {
-            oredictPattern = tag.getBoolean(NBT_OREDICT_PATTERN);
-        }
+        RSUtils.readItems(recipe, 1, tag);
+        oredictPattern = tag.getBoolean(NBT_OREDICT_PATTERN);
+
     }
 
     public void onCreatePattern() {
@@ -105,6 +84,17 @@ public class TileExtremePatternEncoder extends TileBase {
     public void onContentsChanged() {
         recipeOutput.setStackInSlot(0, ExtremeCraftingManager.getInstance().findMatchingRecipe(getCrafting(recipe), getWorld()));
         markDirty();
+    }
+
+    public void clearRecipe() {
+        for (int i = 0; i < recipe.getSlots(); i++) {
+            recipe.setStackInSlot(i, null);
+        }
+        onContentsChanged();
+    }
+
+    public void setOredictPattern(boolean oredictPattern) {
+        this.oredictPattern = oredictPattern;
     }
 
     public static InventoryCrafting getCrafting(IItemHandler recipe) {

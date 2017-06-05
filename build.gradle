@@ -48,7 +48,7 @@ repositories {
 }
 
 minecraft {
-    version = "1.10.2-12.18.3.2281"
+    version = "1.10.2-12.18.3.2221"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -62,7 +62,7 @@ minecraft {
 
 dependencies {	
 	compile "codechicken:CodeChickenLib:${config.mc_version}-${config.ccl_version}:deobf"
-	deobfCompile "MCMultiPart:MCMultiPart:1.3.0:universal"
+	deobfCompile "MCMultiPart:MCMultiPart:1.4.0:universal"
 	
 	compile "refinedstorage:refinedstorage:1.2.25+"
 	
