@@ -1,0 +1,12 @@
+{
+	"parent": "block/cube",
+	"textures": {
+		"particle": "refined_avaritia:blocks/extreme_pattern_encoder",
+		"down": "refinedstorage:blocks/side",
+		"up": "refined_avaritia:blocks/extreme_pattern_encoder",
+		"east": "refined_avaritia:blocks/extreme_pattern_encoder_side",
+		"west": "refined_avaritia:blocks/extreme_pattern_encoder_side",
+		"north": "refined_avaritia:blocks/extreme_pattern_encoder_side",
+		"south": "refined_avaritia:blocks/extreme_pattern_encoder_side"
+	}
+}

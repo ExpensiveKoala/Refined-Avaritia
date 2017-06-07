@@ -1,0 +1,10 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "refined_avaritia:extreme_pattern_encoder"
+	},
+	"variants": {
+		"normal": [{}],
+		"inventory": [{}]
+	}
+}

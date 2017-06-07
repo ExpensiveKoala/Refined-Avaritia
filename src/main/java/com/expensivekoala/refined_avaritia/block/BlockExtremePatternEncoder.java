@@ -12,6 +12,7 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -62,6 +63,21 @@ public class BlockExtremePatternEncoder extends Block implements ITileEntityProv
         }
 
         return true;
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if(tile instanceof TileExtremePatternEncoder) {
+            for (int i = 0; i < ((TileExtremePatternEncoder) tile).getPatterns().getSlots(); i++) {
+                ItemStack stack = ((TileExtremePatternEncoder) tile).getPatterns().getStackInSlot(i);
+                if(stack != null) {
+                    worldIn.spawnEntity(new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), stack));
+                }
+            }
+        }
+
+        super.breakBlock(worldIn, pos, state);
     }
 
     public ItemBlock createItem() {
