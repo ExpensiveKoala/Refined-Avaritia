@@ -1,8 +1,7 @@
 package com.expensivekoala.refined_avaritia.proxy;
 
-import com.expensivekoala.refined_avaritia.RABlocks;
-import com.expensivekoala.refined_avaritia.RAItems;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
+import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
 import com.expensivekoala.refined_avaritia.network.MessageClearExtremePattern;
 import com.expensivekoala.refined_avaritia.network.MessageCreateExtremePattern;
@@ -26,15 +25,15 @@ public class CommonProxy {
 
         GameRegistry.registerTileEntity(TileExtremePatternEncoder.class, RefinedAvaritia.MODID + ":extreme_pattern_encoder");
 
-        GameRegistry.register(RABlocks.EXTREME_PATTERN_ENCODER);
-        GameRegistry.register(RABlocks.EXTREME_PATTERN_ENCODER.createItem());
+        GameRegistry.register(Registry.EXTREME_PATTERN_ENCODER);
+        GameRegistry.register(Registry.EXTREME_PATTERN_ENCODER.createItem());
 
-        GameRegistry.register(RAItems.PATTERN);
+        GameRegistry.register(Registry.PATTERN);
     }
 
     public void init(FMLInitializationEvent e)
     {
-
+        Registry.initRecipes();
     }
 
     public void postInit(FMLPostInitializationEvent e)

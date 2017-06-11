@@ -1,12 +1,10 @@
 package com.expensivekoala.refined_avaritia.proxy;
 
-import com.expensivekoala.refined_avaritia.RABlocks;
-import com.expensivekoala.refined_avaritia.RAItems;
+import com.expensivekoala.refined_avaritia.Registry;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy {
@@ -15,9 +13,9 @@ public class ClientProxy extends CommonProxy {
         super.preInit(e);
 
         //Items
-        ModelLoader.setCustomModelResourceLocation(RAItems.PATTERN, 0, new ModelResourceLocation(RAItems.PATTERN.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Registry.PATTERN, 0, new ModelResourceLocation(Registry.PATTERN.getRegistryName(), "inventory"));
 
         //ItemBlocks
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(RABlocks.EXTREME_PATTERN_ENCODER), 0, new ModelResourceLocation(RABlocks.EXTREME_PATTERN_ENCODER.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(Registry.EXTREME_PATTERN_ENCODER), 0, new ModelResourceLocation(Registry.EXTREME_PATTERN_ENCODER.getRegistryName(), "inventory"));
     }
 }

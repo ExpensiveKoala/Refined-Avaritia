@@ -1,7 +1,7 @@
 package com.expensivekoala.refined_avaritia.item;
 
-import com.expensivekoala.refined_avaritia.RAItems;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
+import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.util.ExtremePattern;
 import com.google.common.collect.Iterables;
 import com.raoulvdberge.refinedstorage.RS;
@@ -65,11 +65,11 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
         ICraftingPattern pattern = getPatternFromCache(playerIn.getEntityWorld(), stack);
         if(pattern.isValid()) {
             if (GuiScreen.isShiftKeyDown()) {
-                tooltip.add(TextFormatting.fromColorIndex((int)(playerIn.getEntityWorld().getWorldTime() % 15)) + I18n.format("misc.refinedstorage:pattern.inputs") + TextFormatting.RESET);
+                tooltip.add(TextFormatting.GOLD + I18n.format("misc.refinedstorage:pattern.inputs") + TextFormatting.RESET);
 
                 combineItems(tooltip, true, Iterables.toArray(pattern.getInputs(), ItemStack.class));
 
-                tooltip.add(TextFormatting.fromColorIndex((int)(playerIn.getEntityWorld().getWorldTime() % 15)) + I18n.format("misc.refinedstorage:pattern.outputs") + TextFormatting.RESET);
+                tooltip.add(TextFormatting.GOLD + I18n.format("misc.refinedstorage:pattern.outputs") + TextFormatting.RESET);
             }
 
             combineItems(tooltip, true, Iterables.toArray(pattern.getOutputs(), ItemStack.class));
@@ -138,7 +138,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     @Override
     public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
         if(!worldIn.isRemote && playerIn.isSneaking())
-            return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(RAItems.PATTERN, itemStackIn.stackSize));
+            return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Registry.PATTERN, itemStackIn.stackSize));
         return new ActionResult<>(EnumActionResult.PASS, itemStackIn);
     }
 
@@ -147,4 +147,6 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     public ICraftingPattern create(World world, ItemStack stack, ICraftingPatternContainer container) {
         return new ExtremePattern(world, container, stack);
     }
+
+
 }

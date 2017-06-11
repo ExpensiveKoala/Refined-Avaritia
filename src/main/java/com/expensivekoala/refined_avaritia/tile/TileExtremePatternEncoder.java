@@ -1,23 +1,17 @@
 package com.expensivekoala.refined_avaritia.tile;
 
-import com.expensivekoala.refined_avaritia.RAItems;
-import com.expensivekoala.refined_avaritia.gui.GuiExtremePatternEncoder;
+import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
 import com.raoulvdberge.refinedstorage.RSUtils;
 import com.raoulvdberge.refinedstorage.inventory.ItemHandlerBasic;
 import com.raoulvdberge.refinedstorage.inventory.ItemValidatorBasic;
 import com.raoulvdberge.refinedstorage.tile.TileBase;
-import com.raoulvdberge.refinedstorage.tile.data.ITileDataConsumer;
-import com.raoulvdberge.refinedstorage.tile.data.ITileDataProducer;
-import com.raoulvdberge.refinedstorage.tile.data.TileDataParameter;
 import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -26,7 +20,7 @@ import net.minecraftforge.items.IItemHandler;
 public class TileExtremePatternEncoder extends TileBase {
     private static final String NBT_OREDICT_PATTERN = "OredictPattern";
 
-    private ItemHandlerBasic patterns = new ItemHandlerBasic(2, this, new ItemValidatorBasic(RAItems.PATTERN));
+    private ItemHandlerBasic patterns = new ItemHandlerBasic(2, this, new ItemValidatorBasic(Registry.PATTERN));
     private ItemHandlerBasic recipe = new ItemHandlerBasic(9 * 9, this);
     private ItemHandlerBasic recipeOutput = new ItemHandlerBasic(1, this);
 
@@ -61,7 +55,7 @@ public class TileExtremePatternEncoder extends TileBase {
         if(canCreatePattern()) {
             patterns.extractItem(0,1,false);
 
-            ItemStack pattern = new ItemStack(RAItems.PATTERN);
+            ItemStack pattern = new ItemStack(Registry.PATTERN);
 
             ItemExtremePattern.setOredict(pattern, oredictPattern);
 

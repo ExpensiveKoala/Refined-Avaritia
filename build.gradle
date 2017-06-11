@@ -12,7 +12,7 @@ apply plugin: 'maven'
 //Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
 
 
-version = "1.0"
+
 group= "com.expensivekoala.refined_avaritia" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "refined_avaritia"
 
@@ -29,7 +29,7 @@ configFile.withReader {
 	prop.load(it)
 	project.ext.config = new ConfigSlurper().parse prop
 }
-
+version = "${config.mc_version}-1.0"
 
 repositories {
 	maven {
