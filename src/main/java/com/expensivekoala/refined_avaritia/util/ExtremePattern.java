@@ -6,6 +6,7 @@ import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContaine
 import com.raoulvdberge.refinedstorage.apiimpl.API;
 import com.raoulvdberge.refinedstorage.apiimpl.autocrafting.registry.CraftingTaskFactory;
 import com.raoulvdberge.refinedstorage.apiimpl.util.Comparer;
+import com.raoulvdberge.refinedstorage.item.ItemPattern;
 import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import morph.avaritia.recipe.extreme.ExtremeShapedOreRecipe;
 import net.minecraft.entity.player.EntityPlayer;
@@ -108,7 +109,8 @@ public class ExtremePattern implements ICraftingPattern {
                                         .map(ItemStack::copy)
                                         .map(Comparer::stripTags)
                                         .map(s -> {
-                                            s.stackSize = input.stackSize;
+                                            s.setCount(input.getCount());
+                                            //s.stackSize = input.stackSize;
                                             return s;
                                         })
                                         .collect(Collectors.toList());
@@ -151,6 +153,11 @@ public class ExtremePattern implements ICraftingPattern {
         {
             return ItemExtremePattern.isOredict(stack);
         }
+
+    @Override
+    public boolean isBlocking() {
+        return ItemPattern.isBlocking(stack);
+    }
 
     @Override
     public List<ItemStack> getInputs()
@@ -240,7 +247,7 @@ public class ExtremePattern implements ICraftingPattern {
         itemStack = Comparer.stripTags(itemStack.copy());
         for(ItemStack output : outputs) {
             if(API.instance().getComparer().isEqual(itemStack, output, i)) {
-                quantity += output.stackSize;
+                quantity += output.getCount();
             }
         }
         return quantity;
@@ -256,5 +263,41 @@ public class ExtremePattern implements ICraftingPattern {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean alike(ICraftingPattern other) {
+        if(other == this)
+            return true;
+
+        if(other.getId().equals(this.getId())
+                && other.isOredict() == this.isOredict()
+                && other.isBlocking() == this.isBlocking()
+                && other.getOreInputs().size() == this.getOreInputs().size()
+                && other.getOutputs().size() == this.getOutputs().size()) {
+            boolean same = true;
+            for (int i = 0; i < other.getOreInputs().size(); i++) {
+                same &= other.getOreInputs().get(i).size() == this.getOreInputs().get(i).size();
+            }
+            int j = 0;
+            while (same && j < other.getOutputs().size()) {
+                same = ItemStack.areItemStacksEqual(other.getOutputs().get(j), this.getOutputs().get(j));
+                j++;
+            }
+            int i = 0;
+            while (same && i < other.getOreInputs().size()) {
+                List<ItemStack> otherList = other.getOreInputs().get(i);
+                List<ItemStack> thisList = this.getOreInputs().get(i);
+                j = 0;
+                while (same && j < otherList.size()) {
+                    same = ItemStack.areItemStacksEqual(otherList.get(j), thisList.get(j));
+                    j++;
+                }
+                i++;
+            }
+            return same;
+        }
+
+        return false;
     }
 }
