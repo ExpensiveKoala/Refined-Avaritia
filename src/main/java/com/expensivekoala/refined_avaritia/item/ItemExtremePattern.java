@@ -78,8 +78,8 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     public static void setSlot(ItemStack pattern, int slot, ItemStack stack) {
         // Safety against bad stacks
-        if (stack.stackSize < 0) {
-            stack.stackSize = 1;
+        if (stack.getCount() < 0) {
+            stack.setCount(1);
         }
 
         if (!pattern.hasTagCompound()) {
@@ -93,10 +93,10 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
         String id = String.format(NBT_SLOT, slot);
 
         if (!pattern.hasTagCompound() || !pattern.getTagCompound().hasKey(id)) {
-            return null;
+            return ItemStack.EMPTY;
         }
 
-        return ItemStack.loadItemStackFromNBT(pattern.getTagCompound().getCompoundTag(id));
+        return new ItemStack(pattern.getTagCompound().getCompoundTag(id));
     }
 
     public static boolean isOredict(ItemStack pattern) {
@@ -115,14 +115,14 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
         Set<Integer> combinedIndices = new HashSet<>();
 
         for (int i = 0; i < stacks.length; ++i) {
-            if (stacks[i] != null && !combinedIndices.contains(i)) {
+            if (!stacks[i].isEmpty() && !combinedIndices.contains(i)) {
                 String data = stacks[i].getDisplayName();
 
-                int amount = stacks[i].stackSize;
+                int amount = stacks[i].getCount();
 
                 for (int j = i + 1; j < stacks.length; ++j) {
                     if (API.instance().getComparer().isEqual(stacks[i], stacks[j])) {
-                        amount += stacks[j].stackSize;
+                        amount += stacks[j].getCount();
 
                         combinedIndices.add(j);
                     }
@@ -136,10 +136,10 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
         if(!worldIn.isRemote && playerIn.isSneaking())
-            return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Registry.PATTERN, itemStackIn.stackSize));
-        return new ActionResult<>(EnumActionResult.PASS, itemStackIn);
+            return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Registry.PATTERN, playerIn.getHeldItem(handIn).getCount()));
+        return new ActionResult<>(EnumActionResult.PASS, playerIn.getHeldItem(handIn));
     }
 
     @Nonnull

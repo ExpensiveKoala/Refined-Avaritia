@@ -54,7 +54,6 @@ public class GuiExtremePatternEncoder extends GuiBase{
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-
         if(isOverClear(mouseX - guiLeft, mouseY - guiTop)) {
             RefinedAvaritia.instance.network.sendToServer(new MessageClearExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ()));
 
@@ -73,7 +72,7 @@ public class GuiExtremePatternEncoder extends GuiBase{
 
         int ty = 0;
 
-        if(isOverCreatePattern(mouseX, mouseY))
+        if(isOverCreatePattern(mouseX-guiLeft, mouseY-guiTop))
             ty = 1;
 
         if(tile != null && !tile.canCreatePattern())
@@ -96,6 +95,7 @@ public class GuiExtremePatternEncoder extends GuiBase{
     public void updateOredictPattern(boolean checked) {
         if(oredictPattern != null) {
             oredictPattern.setIsChecked(checked);
+            tile.setOredictPattern(checked);
         }
     }
 }

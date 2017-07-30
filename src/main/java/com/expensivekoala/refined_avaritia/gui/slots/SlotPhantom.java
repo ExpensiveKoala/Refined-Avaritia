@@ -30,7 +30,7 @@ public class SlotPhantom extends SlotItemHandler{
 
     @Override
     public void putStack(ItemStack stack) {
-        if(!output && stack != null) stack.stackSize = 1;
+        if(!output && !stack.isEmpty()) stack.setCount(1);
         super.putStack(stack);
     }
 

@@ -3,7 +3,7 @@ package com.expensivekoala.refined_avaritia.tile;
 import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
 import com.raoulvdberge.refinedstorage.RSUtils;
-import com.raoulvdberge.refinedstorage.inventory.ItemHandlerBasic;
+import com.raoulvdberge.refinedstorage.inventory.ItemHandlerBase;
 import com.raoulvdberge.refinedstorage.inventory.ItemValidatorBasic;
 import com.raoulvdberge.refinedstorage.tile.TileBase;
 import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
@@ -20,9 +20,9 @@ import net.minecraftforge.items.IItemHandler;
 public class TileExtremePatternEncoder extends TileBase {
     private static final String NBT_OREDICT_PATTERN = "OredictPattern";
 
-    private ItemHandlerBasic patterns = new ItemHandlerBasic(2, this, new ItemValidatorBasic(Registry.PATTERN));
-    private ItemHandlerBasic recipe = new ItemHandlerBasic(9 * 9, this);
-    private ItemHandlerBasic recipeOutput = new ItemHandlerBasic(1, this);
+    private ItemHandlerBase patterns = new ItemHandlerBase(2, new ItemValidatorBasic(Registry.PATTERN));
+    private ItemHandlerBase recipe = new ItemHandlerBase(9 * 9);
+    private ItemHandlerBase recipeOutput = new ItemHandlerBase(1);
 
     private boolean oredictPattern;
 
@@ -62,7 +62,7 @@ public class TileExtremePatternEncoder extends TileBase {
             for (int i = 0; i < 81; i++) {
                 ItemStack ingredient = recipe.getStackInSlot(i);
 
-                if(ingredient != null) {
+                if(!ingredient.isEmpty()) {
                     ItemExtremePattern.setSlot(pattern, i, ingredient);
                 }
             }
@@ -72,17 +72,18 @@ public class TileExtremePatternEncoder extends TileBase {
     }
 
     public boolean canCreatePattern() {
-        return recipeOutput.getStackInSlot(0) != null && patterns.getStackInSlot(1) == null && patterns.getStackInSlot(0) != null;
+        return !recipeOutput.getStackInSlot(0).isEmpty() && patterns.getStackInSlot(1).isEmpty() && !patterns.getStackInSlot(0).isEmpty();
     }
 
     public void onContentsChanged() {
-        recipeOutput.setStackInSlot(0, ExtremeCraftingManager.getInstance().findMatchingRecipe(getCrafting(recipe), getWorld()));
+        ItemStack stack = ExtremeCraftingManager.getInstance().findMatchingRecipe(getCrafting(recipe), getWorld());
+        recipeOutput.setStackInSlot(0, stack);
         markDirty();
     }
 
     public void clearRecipe() {
         for (int i = 0; i < recipe.getSlots(); i++) {
-            recipe.setStackInSlot(i, null);
+            recipe.setStackInSlot(i, ItemStack.EMPTY);
         }
         onContentsChanged();
     }

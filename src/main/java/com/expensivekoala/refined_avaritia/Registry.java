@@ -6,8 +6,6 @@ import com.raoulvdberge.refinedstorage.RSBlocks;
 import com.raoulvdberge.refinedstorage.RSItems;
 import morph.avaritia.init.ModBlocks;
 import morph.avaritia.init.ModItems;
-import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;

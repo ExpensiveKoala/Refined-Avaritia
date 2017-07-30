@@ -3,9 +3,7 @@ package com.expensivekoala.refined_avaritia.gui;
 import com.expensivekoala.refined_avaritia.gui.slots.SlotPhantom;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
 import com.raoulvdberge.refinedstorage.container.ContainerBase;
-import com.raoulvdberge.refinedstorage.container.slot.SlotDisabled;
 import com.raoulvdberge.refinedstorage.container.slot.SlotOutput;
-import com.raoulvdberge.refinedstorage.container.slot.SlotSpecimen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
@@ -38,6 +36,7 @@ public class ContainerExtremePatternEncoder extends ContainerBase {
         //210, 121 addSlotToContainer()
         addSlotToContainer(new SlotPhantom(tile.getRecipeOutput(), 0, 210, 121, true, tile));
         addPlayerInventory(39,174);
+        tile.onContentsChanged();
     }
 
     @Override
@@ -46,7 +45,7 @@ public class ContainerExtremePatternEncoder extends ContainerBase {
         Slot slot = getSlot(slotIndex);
 
         if(slot instanceof SlotPhantom && ((SlotPhantom)slot).isOutput()) {
-            return null;
+            return ItemStack.EMPTY;
         }
 
         if(slot != null && !(slot instanceof SlotPhantom) && slot.getHasStack()) {
@@ -54,17 +53,17 @@ public class ContainerExtremePatternEncoder extends ContainerBase {
 
             if(slotIndex < 2) {
                 if(!mergeItemStack(stack, 2 + 18, inventorySlots.size(), false))
-                    return null;
+                    return ItemStack.EMPTY;
             } else if(!mergeItemStack(stack, 0, 1, false))
-                return null;
+                return ItemStack.EMPTY;
 
-            if(stack.stackSize == 0)
-                slot.putStack(null);
+            if(stack.getCount() == 0)
+                slot.putStack(ItemStack.EMPTY);
             else
                 slot.onSlotChanged();
         }
 
-        return stack;
+        return stack == null ? ItemStack.EMPTY : stack;
     }
 
     @Override
@@ -73,12 +72,12 @@ public class ContainerExtremePatternEncoder extends ContainerBase {
 
         if(slot instanceof SlotPhantom) {
             if(((SlotPhantom) slot).isOutput())
-                return null;
+                return ItemStack.EMPTY;
 
-            if(player.inventory.getItemStack() != null && slot.isItemValid(player.inventory.getItemStack())) {
+            if(!player.inventory.getItemStack().isEmpty() && slot.isItemValid(player.inventory.getItemStack())) {
                 slot.putStack(player.inventory.getItemStack().copy());
-            } else if(player.inventory.getItemStack() == null) {
-                slot.putStack(null);
+            } else if(player.inventory.getItemStack().isEmpty()) {
+                slot.putStack(ItemStack.EMPTY);
             }
             return player.inventory.getItemStack();
         }
