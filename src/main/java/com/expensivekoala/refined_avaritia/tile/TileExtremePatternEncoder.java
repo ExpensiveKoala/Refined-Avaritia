@@ -102,7 +102,8 @@ public class TileExtremePatternEncoder extends TileBase {
         InventoryCrafting crafting = new InventoryCrafting(craftingContainer, 9, 9);
 
         for (int i = 0; i < recipe.getSlots(); i++) {
-            crafting.setInventorySlotContents(i, recipe.getStackInSlot(i));
+            if(recipe.getStackInSlot(i) != ItemStack.EMPTY)
+                crafting.setInventorySlotContents(i, recipe.getStackInSlot(i));
         }
 
         return crafting;

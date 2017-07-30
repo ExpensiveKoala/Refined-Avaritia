@@ -63,7 +63,7 @@ dependencies {
 	//compile "codechicken:CodeChickenLib:${config.mc_version}-${config.ccl_version}:deobf"
 	deobfCompile "MCMultiPart2:MCMultiPart-exp:2.0.0_19"
 	
-	//deobfCompile "refinedstorage:refinedstorage:1.2.25+"
+	//deobfCompile "refinedstorage:refinedstorage:1.4.18+"
 	//runtime "refinedstorage:refinedstorage:1.2.25+"
 	
 	deobfCompile "mezz.jei:jei_${config.mc_version}:${config.jei_version}:api"
