@@ -1,9 +1,9 @@
 [
 {
   "modid": "refined_avaritia",
-  "name": "Avaritita and Refined Storage",
+  "name": "Refined Avaritia",
   "description": "A mod that adds Avaritia support to Refined Storage",
-  "version": "${version}",
+  "version": "1.1",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
