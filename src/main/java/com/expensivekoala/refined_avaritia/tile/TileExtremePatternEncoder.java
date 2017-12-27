@@ -2,11 +2,11 @@ package com.expensivekoala.refined_avaritia.tile;
 
 import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
-import com.raoulvdberge.refinedstorage.RSUtils;
 import com.raoulvdberge.refinedstorage.inventory.ItemHandlerBase;
 import com.raoulvdberge.refinedstorage.inventory.ItemValidatorBasic;
 import com.raoulvdberge.refinedstorage.tile.TileBase;
-import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
+import com.raoulvdberge.refinedstorage.util.StackUtils;
+import morph.avaritia.recipe.AvaritiaRecipeManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
@@ -34,8 +34,8 @@ public class TileExtremePatternEncoder extends TileBase {
     public NBTTagCompound write(NBTTagCompound tag) {
         super.write(tag);
 
-        RSUtils.writeItems(patterns, 0, tag);
-        RSUtils.writeItems(recipe, 1, tag);
+        StackUtils.writeItems(patterns, 0, tag);
+        StackUtils.writeItems(recipe, 1, tag);
 
         tag.setBoolean(NBT_OREDICT_PATTERN, oredictPattern);
 
@@ -45,8 +45,8 @@ public class TileExtremePatternEncoder extends TileBase {
     @Override
     public void read(NBTTagCompound tag) {
         super.read(tag);
-        RSUtils.readItems(patterns, 0, tag);
-        RSUtils.readItems(recipe, 1, tag);
+        StackUtils.readItems(patterns, 0, tag);
+        StackUtils.readItems(recipe, 1, tag);
         oredictPattern = tag.getBoolean(NBT_OREDICT_PATTERN);
 
     }
@@ -76,7 +76,7 @@ public class TileExtremePatternEncoder extends TileBase {
     }
 
     public void onContentsChanged() {
-        ItemStack stack = ExtremeCraftingManager.getInstance().findMatchingRecipe(getCrafting(recipe), getWorld());
+        ItemStack stack = AvaritiaRecipeManager.getExtremeCraftingResult(getCrafting(recipe), getWorld());
         recipeOutput.setStackInSlot(0, stack);
         markDirty();
     }
@@ -86,6 +86,10 @@ public class TileExtremePatternEncoder extends TileBase {
             recipe.setStackInSlot(i, ItemStack.EMPTY);
         }
         onContentsChanged();
+    }
+
+    public boolean getOredictPattern() {
+        return oredictPattern;
     }
 
     public void setOredictPattern(boolean oredictPattern) {

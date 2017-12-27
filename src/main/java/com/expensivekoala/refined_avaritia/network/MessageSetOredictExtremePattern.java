@@ -40,6 +40,7 @@ public class MessageSetOredictExtremePattern extends Message<MessageSetOredictEx
         x = buf.readInt();
         y = buf.readInt();
         z = buf.readInt();
+        value = buf.readBoolean();
     }
 
     @Override
@@ -47,6 +48,7 @@ public class MessageSetOredictExtremePattern extends Message<MessageSetOredictEx
         buf.writeInt(x);
         buf.writeInt(y);
         buf.writeInt(z);
+        buf.writeBoolean(value);
     }
 
 }

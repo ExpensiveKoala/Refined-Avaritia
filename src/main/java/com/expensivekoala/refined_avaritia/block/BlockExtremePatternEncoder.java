@@ -5,11 +5,14 @@ import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
 import com.raoulvdberge.refinedstorage.RS;
 import com.raoulvdberge.refinedstorage.item.ItemBlockBase;
+import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -20,6 +23,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlockExtremePatternEncoder extends Block implements ITileEntityProvider{
@@ -37,15 +41,9 @@ public class BlockExtremePatternEncoder extends Block implements ITileEntityProv
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
+    public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced) {
         super.addInformation(stack, player, tooltip, advanced);
-
         tooltip.add(I18n.format("block.refined_avaritia:extreme_pattern_encoder.tooltip"));
-    }
-
-    @Override
-    public boolean hasTileEntity() {
-        return true;
     }
 
     @Override

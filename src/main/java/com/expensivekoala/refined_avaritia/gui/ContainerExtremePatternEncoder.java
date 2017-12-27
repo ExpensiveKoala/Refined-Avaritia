@@ -83,4 +83,8 @@ public class ContainerExtremePatternEncoder extends ContainerBase {
         }
         return super.slotClick(id, dragType, clickType, player);
     }
+
+    public TileExtremePatternEncoder getTile() {
+        return tile;
+    }
 }

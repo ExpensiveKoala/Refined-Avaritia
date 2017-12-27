@@ -1,0 +1,26 @@
+{
+  "result": {
+    "item": "refined_avaritia:extreme_pattern_encoder"
+  },
+  "pattern": [
+    "n n",
+    "pmp",
+    "nqn"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "n": {
+      "item": "avaritia:resource",
+	  "data": 4
+    },
+    "p": {
+      "item": "refined_avaritia:extreme_pattern"
+    },
+    "m": {
+      "item": "refinedstorage:machine_casing"
+    },
+    "q": {
+      "item": "refinedstorage:quartz_enriched_iron"
+    }
+  }
+}

@@ -9,8 +9,10 @@ import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContainer;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternProvider;
 import com.raoulvdberge.refinedstorage.apiimpl.API;
+import com.raoulvdberge.refinedstorage.util.StackUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,10 +20,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class ItemExtremePattern extends Item implements ICraftingPatternProvider{
@@ -57,22 +61,29 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         if(!stack.hasTagCompound()) {
             return;
         }
 
-        ICraftingPattern pattern = getPatternFromCache(playerIn.getEntityWorld(), stack);
-        if(pattern.isValid()) {
+        ICraftingPattern pattern = getPatternFromCache(worldIn, stack);
+
+        if (pattern.isValid()) {
             if (GuiScreen.isShiftKeyDown()) {
-                tooltip.add(TextFormatting.GOLD + I18n.format("misc.refinedstorage:pattern.inputs") + TextFormatting.RESET);
+                tooltip.add(TextFormatting.YELLOW + I18n.format("misc.refinedstorage:pattern.inputs") + TextFormatting.RESET);
 
-                combineItems(tooltip, true, Iterables.toArray(pattern.getInputs(), ItemStack.class));
+                combineItems(tooltip, true, StackUtils.toNonNullList(pattern.getInputs()));
 
-                tooltip.add(TextFormatting.GOLD + I18n.format("misc.refinedstorage:pattern.outputs") + TextFormatting.RESET);
+                tooltip.add(TextFormatting.YELLOW + I18n.format("misc.refinedstorage:pattern.outputs") + TextFormatting.RESET);
             }
 
-            combineItems(tooltip, true, Iterables.toArray(pattern.getOutputs(), ItemStack.class));
+            combineItems(tooltip, true, StackUtils.toNonNullList(pattern.getOutputs()));
+
+            if (isOredict(stack)) {
+                tooltip.add(TextFormatting.BLUE + I18n.format("misc.refinedstorage:pattern.oredict") + TextFormatting.RESET);
+            }
+        } else {
+            tooltip.add(TextFormatting.RED + I18n.format("misc.refinedstorage:pattern.invalid") + TextFormatting.RESET);
         }
     }
 
@@ -111,18 +122,20 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
         pattern.getTagCompound().setBoolean(NBT_OREDICT, oredict);
     }
 
-    public static void combineItems(List<String> tooltip, boolean displayAmount, ItemStack... stacks) {
+    public static void combineItems(List<String> tooltip, boolean displayAmount, NonNullList<ItemStack> stacks) {
         Set<Integer> combinedIndices = new HashSet<>();
 
-        for (int i = 0; i < stacks.length; ++i) {
-            if (!stacks[i].isEmpty() && !combinedIndices.contains(i)) {
-                String data = stacks[i].getDisplayName();
+        for (int i = 0; i < stacks.size(); ++i) {
+            if (!stacks.get(i).isEmpty() && !combinedIndices.contains(i)) {
+                ItemStack stack = stacks.get(i);
 
-                int amount = stacks[i].getCount();
+                String data = stack.getDisplayName();
 
-                for (int j = i + 1; j < stacks.length; ++j) {
-                    if (API.instance().getComparer().isEqual(stacks[i], stacks[j])) {
-                        amount += stacks[j].getCount();
+                int amount = stack.getCount();
+
+                for (int j = i + 1; j < stacks.size(); ++j) {
+                    if (API.instance().getComparer().isEqual(stack, stacks.get(j))) {
+                        amount += stacks.get(j).getCount();
 
                         combinedIndices.add(j);
                     }
@@ -134,6 +147,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
             }
         }
     }
+
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {

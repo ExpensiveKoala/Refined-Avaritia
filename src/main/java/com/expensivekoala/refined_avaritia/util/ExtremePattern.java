@@ -7,18 +7,18 @@ import com.raoulvdberge.refinedstorage.apiimpl.API;
 import com.raoulvdberge.refinedstorage.apiimpl.autocrafting.registry.CraftingTaskFactory;
 import com.raoulvdberge.refinedstorage.apiimpl.util.Comparer;
 import com.raoulvdberge.refinedstorage.item.ItemPattern;
+import morph.avaritia.recipe.AvaritiaRecipeManager;
 import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
-import morph.avaritia.recipe.extreme.ExtremeShapedOreRecipe;
+import morph.avaritia.recipe.extreme.IExtremeRecipe;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +26,7 @@ public class ExtremePattern implements ICraftingPattern {
 
     private ICraftingPatternContainer container;
     private ItemStack stack;
-    private IRecipe recipe;
+    private IExtremeRecipe recipe;
     private List<ItemStack> inputs = new ArrayList<>();
     private List<List<ItemStack>> oreInputs = new ArrayList<>();
     private List<ItemStack> outputs = new ArrayList<>();
@@ -38,87 +38,93 @@ public class ExtremePattern implements ICraftingPattern {
 
         InventoryCrafting inv = new InventoryCrafting(new Container() {
             @Override
-            public boolean canInteractWith(EntityPlayer playerIn)
-                {
-                    return false;
-                }
+            public boolean canInteractWith(EntityPlayer player) {
+                return false;
+            }
         }, 9, 9);
 
-        for (int i = 0; i < 81; i++) {
+        for (int i = 0; i < 81; ++i) {
             ItemStack slot = ItemExtremePattern.getSlot(stack, i);
-            inputs.add(slot);
-            inv.setInventorySlotContents(i, slot);
-        }
 
-        recipe = (IRecipe)ExtremeCraftingManager.getInstance().getRecipeList().stream().filter(r -> ((IRecipe)r).matches(inv, world)).findFirst().orElse(null);
-        if(recipe != null) {
-            ItemStack output = recipe.getCraftingResult(inv);
-            if(!output.isEmpty()) {
-                boolean shapedOre = recipe instanceof ExtremeShapedOreRecipe;
-                outputs.add(Comparer.stripTags(output.copy()));
+            inputs.add(Comparer.stripTags(slot));
 
-                if(isOredict() && shapedOre) {
-                    Object[] inputs = new Object[0];
-                    if(shapedOre) {
-                        inputs = ((ExtremeShapedOreRecipe)recipe).getInput();
-                    } else {
-                        try {
-                            inputs = (Object[])recipe.getClass().getMethod("getInput").invoke(recipe);
-                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    for (Object input : inputs) {
-                        if(input == null) {
-                            oreInputs.add(Collections.emptyList());
-                        } else if (input instanceof ItemStack) {
-                            oreInputs.add(Collections.singletonList(Comparer.stripTags((ItemStack)input).copy()));
-                        } else {
-                            List<ItemStack> cleaned = new LinkedList<>();
-                            for (ItemStack in : (List<ItemStack>)input) {
-                                cleaned.add(Comparer.stripTags(in.copy()));
-                            }
-
-                            oreInputs.add(cleaned);
-                        }
-                    }
-                }
-
-                for(ItemStack remaining : recipe.getRemainingItems(inv)) {
-                    if (!remaining.isEmpty()) {
-                        byproducts.add(Comparer.stripTags(remaining.copy()));
-                    }
-                }
+            if (slot != null) {
+                inv.setInventorySlotContents(i, slot);
             }
         }
 
-        if(oreInputs.isEmpty()) {
-            for(ItemStack input : inputs) {
-                if(input.isEmpty()) {
-                    oreInputs.add(Collections.emptyList());
-                } else if(isOredict()) {
-                    int[] ids = OreDictionary.getOreIDs(input);
-                    if(ids == null || ids.length == 0) {
-                        oreInputs.add(Collections.singletonList(Comparer.stripTags(input)));
-                    } else {
-                        List<ItemStack> oredict =
-                                Arrays.stream(ids)
-                                        .mapToObj(OreDictionary::getOreName)
-                                        .map(OreDictionary::getOres)
-                                        .flatMap(List::stream)
-                                        .map(ItemStack::copy)
-                                        .map(Comparer::stripTags)
-                                        .map(s -> {
-                                            s.setCount(input.getCount());
-                                            return s;
-                                        })
-                                        .collect(Collectors.toList());
-                        // Add original stack as first, should prevent some issues
-                        oredict.add(0, Comparer.stripTags(input.copy()));
-                        oreInputs.add(oredict);
+        if (!ItemPattern.isProcessing(stack)) {
+            for (IExtremeRecipe r : AvaritiaRecipeManager.EXTREME_RECIPES.values()) {
+                if (r.matches(inv, world)) {
+                    recipe = r;
+                    break;
+                }
+            }
+
+            if (recipe != null) {
+                ItemStack output = recipe.getCraftingResult(inv);
+
+                if (!output.isEmpty()) {
+                    outputs.add(Comparer.stripTags(output.copy()));
+
+                    if (isOredict()) {
+                        List<List<ItemStack>> inputs = new LinkedList<>();
+
+                        for (Ingredient ingredient : recipe.getIngredients()) {
+                            inputs.add(Arrays.asList(ingredient.getMatchingStacks()));
+                        }
+
+                        for (List<ItemStack> input : inputs) {
+                            if (input.isEmpty()) {
+                                oreInputs.add(Collections.emptyList());
+                            } else {
+                                List<ItemStack> cleaned = new LinkedList<>();
+                                for (ItemStack in : input) {
+                                    cleaned.add(Comparer.stripTags(in.copy()));
+                                }
+                                oreInputs.add(cleaned);
+                            }
+                        }
                     }
+
+                    for (ItemStack remaining : recipe.getRemainingItems(inv)) {
+                        if (!remaining.isEmpty()) {
+                            ItemStack cleaned = Comparer.stripTags(remaining.copy());
+                            byproducts.add(cleaned);
+                        }
+                    }
+                }
+            }
+        } else {
+            outputs = ItemPattern.getOutputs(stack);
+        }
+
+        if (oreInputs.isEmpty()) {
+            for (ItemStack input : inputs) {
+                if (input == null || input.isEmpty()) {
+                    oreInputs.add(Collections.emptyList());
                 } else {
-                    oreInputs.add(Collections.singletonList(Comparer.stripTags(input)));
+                    int[] ids = OreDictionary.getOreIDs(input);
+
+                    if (ids.length == 0) {
+                        oreInputs.add(Collections.singletonList(Comparer.stripTags(input)));
+                    } else if (isOredict()) {
+                        List<ItemStack> oredictInputs = Arrays.stream(ids)
+                                .mapToObj(OreDictionary::getOreName)
+                                .map(OreDictionary::getOres)
+                                .flatMap(List::stream)
+                                .map(ItemStack::copy)
+                                .map(Comparer::stripTags)
+                                .peek(s -> s.setCount(input.getCount()))
+                                .collect(Collectors.toList());
+
+                        // Add original stack as first, should prevent some issues
+                        oredictInputs.add(0, Comparer.stripTags(input.copy()));
+
+                        oreInputs.add(oredictInputs);
+                    } else {
+                        oreInputs.add(Collections.singletonList(Comparer.stripTags(input)));
+                    }
                 }
             }
         }
@@ -138,7 +144,7 @@ public class ExtremePattern implements ICraftingPattern {
 
     @Override
     public boolean isValid() {
-        return inputs.stream().filter(Objects::nonNull).count() > 0 && !outputs.isEmpty();
+        return !inputs.isEmpty() && inputs.stream().filter(Objects::nonNull).count() > 0 && !outputs.isEmpty();
     }
 
     @Override
@@ -184,7 +190,12 @@ public class ExtremePattern implements ICraftingPattern {
         }, 9, 9);
 
         for (int i = 0; i < 81; i++) {
-            inv.setInventorySlotContents(i, itemStacks[i]);
+            if(itemStacks[i] == null) {
+                inv.setInventorySlotContents(i, ItemStack.EMPTY);
+            }
+            else {
+                inv.setInventorySlotContents(i, itemStacks[i]);
+            }
         }
 
         ItemStack cleaned = recipe.getCraftingResult(inv);
@@ -216,7 +227,12 @@ public class ExtremePattern implements ICraftingPattern {
         }, 9, 9);
 
         for (int i = 0; i < 81; ++i) {
-            inv.setInventorySlotContents(i, itemStacks[i]);
+            if(itemStacks[i] == null) {
+                inv.setInventorySlotContents(i, ItemStack.EMPTY);
+            }
+            else {
+                inv.setInventorySlotContents(i, itemStacks[i]);
+            }
         }
 
         for (ItemStack remaining : recipe.getRemainingItems(inv)) {

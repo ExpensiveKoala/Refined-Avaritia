@@ -26,7 +26,7 @@ public class GuiExtremePatternEncoder extends GuiBase{
 
     @Override
     public void init(int x, int y) {
-        oredictPattern = addCheckBox(x + 175, y + 156, t("misc.refined_avaritia:oredict"), false);
+        oredictPattern = addCheckBox(x + 175, y + 156, t("misc.refined_avaritia:oredict"), tile.getOredictPattern());
     }
 
     @Override

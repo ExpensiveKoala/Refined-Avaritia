@@ -1,0 +1,23 @@
+{
+  "result": {
+    "item": "refined_avaritia:extreme_pattern"
+  },
+  "pattern": [
+    "gpg",
+    "pgp",
+    "nnn"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "n": {
+      "item": "avaritia:resource",
+	  "data": 4
+    },
+    "p": {
+      "item": "refinedstorage:pattern"
+    },
+    "g": {
+      "item": "minecraft:glass"
+    }
+  }
+}
