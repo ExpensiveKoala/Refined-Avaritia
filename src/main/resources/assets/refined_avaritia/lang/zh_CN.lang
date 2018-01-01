@@ -1,0 +1,8 @@
+item.refined_avaritia:extreme_pattern.name=极限模板
+
+block.refined_avaritia:extreme_pattern_encoder.name=终极编码器
+block.refined_avaritia:extreme_pattern_encoder.tooltip=仅用于编写终极合成配方。
+
+misc.refined_avaritia:oredict=矿物辞典
+misc.refined_avaritia:clear_tooltip=清除
+misc.refined_avaritia:create_pattern_tooltip=创建
