@@ -6,7 +6,7 @@ import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
 import com.expensivekoala.refined_avaritia.network.MessageClearExtremePattern;
 import com.expensivekoala.refined_avaritia.network.MessageCreateExtremePattern;
 import com.expensivekoala.refined_avaritia.network.MessageSetOredictExtremePattern;
-import com.expensivekoala.refined_avaritia.network.MessageTransferRecipe;
+import com.expensivekoala.refined_avaritia.network.MessageTransferAvaritiaRecipe;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -26,7 +26,7 @@ public class CommonProxy {
         RefinedAvaritia.instance.network.registerMessage(MessageCreateExtremePattern.class, MessageCreateExtremePattern.class, 0, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageClearExtremePattern.class, MessageClearExtremePattern.class, 1, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageSetOredictExtremePattern.class, MessageSetOredictExtremePattern.class, 2, Side.SERVER);
-        RefinedAvaritia.instance.network.registerMessage(MessageTransferRecipe.class, MessageTransferRecipe.class, 3, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageTransferAvaritiaRecipe.class, MessageTransferAvaritiaRecipe.class, 3, Side.SERVER);
     }
 
     public void init(FMLInitializationEvent e)

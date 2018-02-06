@@ -3,16 +3,12 @@ package com.expensivekoala.refined_avaritia.block;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
-import com.raoulvdberge.refinedstorage.RS;
-import com.raoulvdberge.refinedstorage.item.ItemBlockBase;
-import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -32,7 +28,8 @@ public class BlockExtremePatternEncoder extends Block implements ITileEntityProv
         super(Material.ROCK);
         setHardness(1.9f);
         setRegistryName(RefinedAvaritia.MODID, "extreme_pattern_encoder");
-        setCreativeTab(RS.INSTANCE.tab);
+        //TODO: add creative tab
+        //setCreativeTab(RS.INSTANCE.tab);
     }
 
     @Override
@@ -76,7 +73,9 @@ public class BlockExtremePatternEncoder extends Block implements ITileEntityProv
     }
 
     public ItemBlock createItem() {
-        return new ItemBlockBase(this, null, false);
+        ItemBlock itemBlock = new ItemBlock(this);
+        itemBlock.setRegistryName(this.getRegistryName());
+        return itemBlock;
     }
 
     @Override

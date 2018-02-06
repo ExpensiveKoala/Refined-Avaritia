@@ -1,7 +1,7 @@
 package com.expensivekoala.refined_avaritia.network;
 
+import com.expensivekoala.refined_avaritia.inventory.ItemHandlerRestricted;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
-import com.raoulvdberge.refinedstorage.inventory.ItemHandlerBase;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -14,15 +14,15 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 /**
  * @author ExpensiveKoala
  */
-public class MessageTransferRecipe extends Message<MessageTransferRecipe> implements IMessage {
+public class MessageTransferAvaritiaRecipe extends Message<MessageTransferAvaritiaRecipe> implements IMessage {
 
     private int x, y, z;
     private NonNullList<ItemStack> items;
 
-    public MessageTransferRecipe() {
+    public MessageTransferAvaritiaRecipe() {
     }
 
-    public MessageTransferRecipe(int x, int y, int z, NonNullList<ItemStack> items) {
+    public MessageTransferAvaritiaRecipe(int x, int y, int z, NonNullList<ItemStack> items) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -30,15 +30,16 @@ public class MessageTransferRecipe extends Message<MessageTransferRecipe> implem
     }
 
     @Override
-    public void handle(MessageTransferRecipe message, EntityPlayerMP player) {
+    public void handle(MessageTransferAvaritiaRecipe message, EntityPlayerMP player) {
         TileEntity tile = player.getEntityWorld().getTileEntity(new BlockPos(message.x, message.y, message.z));
 
         if(tile instanceof TileExtremePatternEncoder) {
             TileExtremePatternEncoder encoder = (TileExtremePatternEncoder)tile;
-            ItemHandlerBase recipe = (ItemHandlerBase)encoder.getRecipe();
+            ItemHandlerRestricted recipe = (ItemHandlerRestricted)encoder.getRecipe();
             for (int i = 0; i < recipe.getSlots(); i++) {
                 recipe.setStackInSlot(i, message.items.get(i));
             }
+            ((TileExtremePatternEncoder) tile).onContentsChanged();
         }
     }
 

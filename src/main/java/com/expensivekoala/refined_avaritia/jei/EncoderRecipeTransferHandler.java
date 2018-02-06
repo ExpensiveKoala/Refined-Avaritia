@@ -2,7 +2,7 @@ package com.expensivekoala.refined_avaritia.jei;
 
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.gui.ContainerExtremePatternEncoder;
-import com.expensivekoala.refined_avaritia.network.MessageTransferRecipe;
+import com.expensivekoala.refined_avaritia.network.MessageTransferAvaritiaRecipe;
 import mezz.jei.api.gui.IGuiIngredient;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
@@ -58,7 +58,7 @@ public class EncoderRecipeTransferHandler implements IRecipeTransferHandler<Cont
 
             if(recipe != null) {
                 RefinedAvaritia.instance.network.sendToServer(
-                        new MessageTransferRecipe(
+                        new MessageTransferAvaritiaRecipe(
                                 container.getTile().getPos().getX(),
                                 container.getTile().getPos().getY(),
                                 container.getTile().getPos().getZ(),

@@ -5,6 +5,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;
 import morph.avaritia.compat.jei.AvaritiaJEIPlugin;
+import net.minecraftforge.fml.common.Loader;
 
 /**
  * @author ExpensiveKoala
@@ -13,7 +14,9 @@ import morph.avaritia.compat.jei.AvaritiaJEIPlugin;
 public class RefinedAvaritiaJEI implements IModPlugin {
     @Override
     public void register(IModRegistry registry) {
-        registry.getRecipeTransferRegistry().addRecipeTransferHandler(new EncoderRecipeTransferHandler(), AvaritiaJEIPlugin.EXTREME_CRAFTING);
-        registry.addRecipeClickArea(GuiExtremePatternEncoder.class, 175, 119, 24, 20, AvaritiaJEIPlugin.EXTREME_CRAFTING);
+        if(Loader.isModLoaded("avaritia")) {
+            registry.getRecipeTransferRegistry().addRecipeTransferHandler(new EncoderRecipeTransferHandler(), AvaritiaJEIPlugin.EXTREME_CRAFTING);
+            registry.addRecipeClickArea(GuiExtremePatternEncoder.class, 175, 119, 24, 20, AvaritiaJEIPlugin.EXTREME_CRAFTING);
+        }
     }
 }

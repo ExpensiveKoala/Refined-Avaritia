@@ -1,28 +1,29 @@
 package com.expensivekoala.refined_avaritia.tile;
 
+import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.Registry;
+import com.expensivekoala.refined_avaritia.inventory.ItemHandlerRestricted;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
-import com.raoulvdberge.refinedstorage.inventory.ItemHandlerBase;
-import com.raoulvdberge.refinedstorage.inventory.ItemValidatorBasic;
-import com.raoulvdberge.refinedstorage.tile.TileBase;
-import com.raoulvdberge.refinedstorage.util.StackUtils;
-import morph.avaritia.recipe.AvaritiaRecipeManager;
+import com.expensivekoala.refined_avaritia.util.RecipeManager;
+import com.expensivekoala.refined_avaritia.util.StackUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class TileExtremePatternEncoder extends TileBase {
+public class TileExtremePatternEncoder extends TileEntity {
     private static final String NBT_OREDICT_PATTERN = "OredictPattern";
 
-    private ItemHandlerBase patterns = new ItemHandlerBase(2, new ItemValidatorBasic(Registry.PATTERN));
-    private ItemHandlerBase recipe = new ItemHandlerBase(9 * 9);
-    private ItemHandlerBase recipeOutput = new ItemHandlerBase(1);
+    private ItemHandlerRestricted patterns = new ItemHandlerRestricted(2, new ResourceLocation(RefinedAvaritia.MODID, "extreme_pattern"));
+    private ItemHandlerRestricted recipe = new ItemHandlerRestricted(9 * 9);
+    private ItemHandlerRestricted recipeOutput = new ItemHandlerRestricted(1);
 
     private boolean oredictPattern;
 
@@ -31,8 +32,8 @@ public class TileExtremePatternEncoder extends TileBase {
     }
 
     @Override
-    public NBTTagCompound write(NBTTagCompound tag) {
-        super.write(tag);
+    public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+        super.writeToNBT(tag);
 
         StackUtils.writeItems(patterns, 0, tag);
         StackUtils.writeItems(recipe, 1, tag);
@@ -43,12 +44,11 @@ public class TileExtremePatternEncoder extends TileBase {
     }
 
     @Override
-    public void read(NBTTagCompound tag) {
-        super.read(tag);
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
         StackUtils.readItems(patterns, 0, tag);
         StackUtils.readItems(recipe, 1, tag);
         oredictPattern = tag.getBoolean(NBT_OREDICT_PATTERN);
-
     }
 
     public void onCreatePattern() {
@@ -76,7 +76,7 @@ public class TileExtremePatternEncoder extends TileBase {
     }
 
     public void onContentsChanged() {
-        ItemStack stack = AvaritiaRecipeManager.getExtremeCraftingResult(getCrafting(recipe), getWorld());
+        ItemStack stack = RecipeManager.getCraftingResult(getCrafting(recipe), getWorld());
         recipeOutput.setStackInSlot(0, stack);
         markDirty();
     }
@@ -122,11 +122,6 @@ public class TileExtremePatternEncoder extends TileBase {
     }
 
     public IItemHandler getRecipeOutput() { return recipeOutput; }
-
-    @Override
-    public IItemHandler getDrops() {
-        return patterns;
-    }
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {

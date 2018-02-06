@@ -14,8 +14,9 @@ import org.apache.logging.log4j.Logger;
 public class RefinedAvaritia {
     public static final String MODID = "refined_avaritia";
     public static final String MODNAME = "Refined Avaritia";
-    public static final String VERSION = "1.2";
-    public static final String DEPENDENCIES = "required-after:refinedstorage@[1.5.30,);required-after:avaritia@[3.2,)";
+    public static final String VERSION = "2.0";
+    public static final String DEPENDENCIES = "after:refinedstorage@[1.5.30,);after:avaritia@[3.2,);" +
+            "after:extendedcrafting@[1.2.0,);after:appliedenergistics2@[r5-stable-7,)";
 
     @SidedProxy(clientSide = "com.expensivekoala.refined_avaritia.proxy.ClientProxy", serverSide = "com.expensivekoala.refined_avaritia.proxy.CommonProxy")
     public static CommonProxy proxy;

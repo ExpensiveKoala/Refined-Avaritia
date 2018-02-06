@@ -2,23 +2,30 @@ package com.expensivekoala.refined_avaritia.gui;
 
 import com.expensivekoala.refined_avaritia.gui.slots.SlotPhantom;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
-import com.raoulvdberge.refinedstorage.container.ContainerBase;
-import com.raoulvdberge.refinedstorage.container.slot.SlotOutput;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class ContainerExtremePatternEncoder extends ContainerBase {
+import javax.annotation.Nonnull;
+
+public class ContainerExtremePatternEncoder extends Container {
 
     TileExtremePatternEncoder tile;
+    EntityPlayer player;
 
     public ContainerExtremePatternEncoder(TileExtremePatternEncoder tile, EntityPlayer player) {
-        super(tile, player);
         this.tile = tile;
+        this.player = player;
         addSlotToContainer(new SlotItemHandler(tile.getPatterns(), 0, 199, 37));
-        addSlotToContainer(new SlotOutput(tile.getPatterns(), 1, 199, 77));
+        addSlotToContainer(new SlotItemHandler(tile.getPatterns(), 1, 199, 77) {
+            @Override
+            public boolean isItemValid(@Nonnull ItemStack stack) {
+                return false;
+            }
+        });
 
         int x = 12;
         int y = 8;
@@ -37,6 +44,22 @@ public class ContainerExtremePatternEncoder extends ContainerBase {
         addSlotToContainer(new SlotPhantom(tile.getRecipeOutput(), 0, 210, 121, true, tile));
         addPlayerInventory(39,174);
         tile.onContentsChanged();
+    }
+
+    private void addPlayerInventory(int xInventory, int yInventory) {
+        int id = 0;
+
+        for (int i = 0; i < 9; i++) {
+            int x = xInventory + i * 18;
+            int y = yInventory + 4 + (3 * 18);
+            addSlotToContainer(new Slot(player.inventory, id++, x, y));
+        }
+
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 9; x++) {
+                addSlotToContainer(new Slot(player.inventory, id++, xInventory + x * 18, yInventory + y * 18));
+            }
+        }
     }
 
     @Override
@@ -82,6 +105,11 @@ public class ContainerExtremePatternEncoder extends ContainerBase {
             return player.inventory.getItemStack();
         }
         return super.slotClick(id, dragType, clickType, player);
+    }
+
+    @Override
+    public boolean canInteractWith(EntityPlayer playerIn) {
+        return true;
     }
 
     public TileExtremePatternEncoder getTile() {
