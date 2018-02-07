@@ -3,6 +3,7 @@ package com.expensivekoala.refined_avaritia.item;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.util.ExtremePattern;
+import com.expensivekoala.refined_avaritia.util.RecipeType;
 import com.raoulvdberge.refinedstorage.RS;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContainer;
@@ -36,6 +37,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     private static final String NBT_SLOT = "Slot_%d";
     private static final String NBT_OREDICT = "Oredict";
+    public static final String NBT_TYPE = "Type";
 
     public ItemExtremePattern() {
         setRegistryName(RefinedAvaritia.MODID, "extreme_pattern");
@@ -121,6 +123,18 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
         pattern.getTagCompound().setBoolean(NBT_OREDICT, oredict);
     }
 
+    public static void setType(ItemStack pattern, RecipeType type) {
+        if(!pattern.hasTagCompound()) {
+            pattern.setTagCompound(new NBTTagCompound());
+        }
+
+        pattern.getTagCompound().setInteger(NBT_TYPE, type.ordinal());
+    }
+
+    public static RecipeType getType(ItemStack pattern) {
+        return pattern.hasTagCompound() && pattern.getTagCompound().hasKey(NBT_TYPE) ? RecipeType.values()[pattern.getTagCompound().getInteger(NBT_TYPE)] : null;
+    }
+
     public static void combineItems(List<String> tooltip, boolean displayAmount, NonNullList<ItemStack> stacks) {
         Set<Integer> combinedIndices = new HashSet<>();
 
@@ -147,7 +161,6 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
         }
     }
 
-
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
         if(!worldIn.isRemote && playerIn.isSneaking())
@@ -160,6 +173,4 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     public ICraftingPattern create(World world, ItemStack stack, ICraftingPatternContainer container) {
         return new ExtremePattern(world, container, stack);
     }
-
-
 }

@@ -1,5 +1,8 @@
 package com.expensivekoala.refined_avaritia.util;
 
+import com.blakebr0.extendedcrafting.crafting.table.ITieredRecipe;
+import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
+import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContainer;
@@ -14,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
@@ -26,7 +30,9 @@ public class ExtremePattern implements ICraftingPattern {
 
     private ICraftingPatternContainer container;
     private ItemStack stack;
-    private IExtremeRecipe recipe;
+    private IExtremeRecipe avaritiaRecipe;
+    private IRecipe extendedRecipe;
+    private RecipeType recipeType;
     private List<ItemStack> inputs = new ArrayList<>();
     private List<List<ItemStack>> oreInputs = new ArrayList<>();
     private List<ItemStack> outputs = new ArrayList<>();
@@ -34,6 +40,13 @@ public class ExtremePattern implements ICraftingPattern {
 
     public ExtremePattern(World world, ICraftingPatternContainer container, ItemStack stack) {
         this.container = container;
+        if(stack.hasTagCompound() && stack.getTagCompound().hasKey(ItemExtremePattern.NBT_TYPE)) {
+            this.recipeType = ItemExtremePattern.getType(stack);
+        }
+        else {
+            RefinedAvaritia.logger.warn("Assuming Avaritia recipe. If you see this message, remake your pattern.");
+            this.recipeType = RecipeType.AVARITIA;
+        }
         this.stack = Comparer.stripTags(stack);
 
         InventoryCrafting inv = new InventoryCrafting(new Container() {
@@ -41,9 +54,9 @@ public class ExtremePattern implements ICraftingPattern {
             public boolean canInteractWith(EntityPlayer player) {
                 return false;
             }
-        }, 9, 9);
+        }, recipeType.width, recipeType.height);
 
-        for (int i = 0; i < 81; ++i) {
+        for (int i = 0; i < (recipeType.width * recipeType.height); ++i) {
             ItemStack slot = ItemExtremePattern.getSlot(stack, i);
 
             inputs.add(Comparer.stripTags(slot));
@@ -54,15 +67,25 @@ public class ExtremePattern implements ICraftingPattern {
         }
 
         if (!ItemPattern.isProcessing(stack)) {
-            for (IExtremeRecipe r : AvaritiaRecipeManager.EXTREME_RECIPES.values()) {
-                if (r.matches(inv, world)) {
-                    recipe = r;
-                    break;
+            if(recipeType == RecipeType.AVARITIA) {
+                for (IExtremeRecipe r : AvaritiaRecipeManager.EXTREME_RECIPES.values()) {
+                    if (r.matches(inv, world)) {
+                        avaritiaRecipe = r;
+                        break;
+                    }
+                }
+            } else {
+                for (Object o : TableRecipeManager.getInstance().getRecipes()) {
+                    IRecipe r = (IRecipe)o;
+                    if(r.matches(inv, world)) {
+                        extendedRecipe = r;
+                        break;
+                    }
                 }
             }
 
-            if (recipe != null) {
-                ItemStack output = recipe.getCraftingResult(inv);
+            if (avaritiaRecipe != null || extendedRecipe != null) {
+                ItemStack output = recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getCraftingResult(inv) : extendedRecipe.getCraftingResult(inv);
 
                 if (!output.isEmpty()) {
                     outputs.add(Comparer.stripTags(output.copy()));
@@ -70,7 +93,7 @@ public class ExtremePattern implements ICraftingPattern {
                     if (isOredict()) {
                         List<List<ItemStack>> inputs = new LinkedList<>();
 
-                        for (Ingredient ingredient : recipe.getIngredients()) {
+                        for (Ingredient ingredient : recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getIngredients() : extendedRecipe.getIngredients()) {
                             inputs.add(Arrays.asList(ingredient.getMatchingStacks()));
                         }
 
@@ -87,7 +110,7 @@ public class ExtremePattern implements ICraftingPattern {
                         }
                     }
 
-                    for (ItemStack remaining : recipe.getRemainingItems(inv)) {
+                    for (ItemStack remaining : recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getRemainingItems(inv) : extendedRecipe.getRemainingItems(inv)) {
                         if (!remaining.isEmpty()) {
                             ItemStack cleaned = Comparer.stripTags(remaining.copy());
                             byproducts.add(cleaned);
@@ -187,9 +210,9 @@ public class ExtremePattern implements ICraftingPattern {
             public boolean canInteractWith(EntityPlayer playerIn) {
                 return false;
             }
-        }, 9, 9);
+        }, recipeType.width, recipeType.height);
 
-        for (int i = 0; i < 81; i++) {
+        for (int i = 0; i < (recipeType.width * recipeType.height) && i < itemStacks.length; i++) {
             if(itemStacks[i] == null) {
                 inv.setInventorySlotContents(i, ItemStack.EMPTY);
             }
@@ -198,7 +221,7 @@ public class ExtremePattern implements ICraftingPattern {
             }
         }
 
-        ItemStack cleaned = recipe.getCraftingResult(inv);
+        ItemStack cleaned = recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getCraftingResult(inv) : extendedRecipe.getCraftingResult(inv);
         if(cleaned.isEmpty()) {
             return null;
         }
@@ -224,9 +247,9 @@ public class ExtremePattern implements ICraftingPattern {
             public boolean canInteractWith(EntityPlayer player) {
                 return false;
             }
-        }, 9, 9);
+        }, recipeType.width, recipeType.height);
 
-        for (int i = 0; i < 81; ++i) {
+        for (int i = 0; i < (recipeType.width * recipeType.height) && i < itemStacks.length; ++i) {
             if(itemStacks[i] == null) {
                 inv.setInventorySlotContents(i, ItemStack.EMPTY);
             }
@@ -235,7 +258,7 @@ public class ExtremePattern implements ICraftingPattern {
             }
         }
 
-        for (ItemStack remaining : recipe.getRemainingItems(inv)) {
+        for (ItemStack remaining : recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getRemainingItems(inv) : extendedRecipe.getRemainingItems(inv)) {
             if (!remaining.isEmpty()) {
                 byproducts.add(remaining.copy());
             }

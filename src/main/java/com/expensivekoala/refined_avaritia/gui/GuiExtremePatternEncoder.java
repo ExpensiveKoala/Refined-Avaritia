@@ -45,9 +45,10 @@ public class GuiExtremePatternEncoder extends GuiContainer{
         buttonList.clear();
         lastButtonId = 0;
 
-
         oredictPattern = addCheckBox(guiLeft + 175, guiTop + 156, I18n.format("misc.refined_avaritia:oredict"), tile.getOredictPattern());
     }
+
+
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -87,6 +88,7 @@ public class GuiExtremePatternEncoder extends GuiContainer{
         super.actionPerformed(button);
 
         if(button == oredictPattern) {
+            tile.setOredictPattern(oredictPattern.isChecked());
             RefinedAvaritia.instance.network.sendToServer(new MessageSetOredictExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), oredictPattern.isChecked()));
         }
     }

@@ -5,6 +5,7 @@ import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.inventory.ItemHandlerRestricted;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
 import com.expensivekoala.refined_avaritia.util.RecipeManager;
+import com.expensivekoala.refined_avaritia.util.RecipeType;
 import com.expensivekoala.refined_avaritia.util.StackUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -58,6 +59,8 @@ public class TileExtremePatternEncoder extends TileEntity {
             ItemStack pattern = new ItemStack(Registry.PATTERN);
 
             ItemExtremePattern.setOredict(pattern, oredictPattern);
+
+            ItemExtremePattern.setType(pattern, RecipeType.AVARITIA);
 
             for (int i = 0; i < 81; i++) {
                 ItemStack ingredient = recipe.getStackInSlot(i);
