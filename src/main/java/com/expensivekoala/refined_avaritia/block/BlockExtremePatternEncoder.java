@@ -28,8 +28,7 @@ public class BlockExtremePatternEncoder extends Block implements ITileEntityProv
         super(Material.ROCK);
         setHardness(1.9f);
         setRegistryName(RefinedAvaritia.MODID, "extreme_pattern_encoder");
-        //TODO: add creative tab
-        //setCreativeTab(RS.INSTANCE.tab);
+        setCreativeTab(RefinedAvaritia.instance.tab);
     }
 
     @Override

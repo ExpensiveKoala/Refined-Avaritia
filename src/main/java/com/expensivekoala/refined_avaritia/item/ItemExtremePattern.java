@@ -2,7 +2,7 @@ package com.expensivekoala.refined_avaritia.item;
 
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.Registry;
-import com.expensivekoala.refined_avaritia.util.RSExtremePattern;
+import com.expensivekoala.refined_avaritia.util.ExtremePattern;
 import com.raoulvdberge.refinedstorage.RS;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContainer;
@@ -32,7 +32,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     /**
      * Blatantly copying Refined Storage <3
      */
-    private static Map<ItemStack, RSExtremePattern> PATTERN_CACHE = new HashMap<>();
+    private static Map<ItemStack, ExtremePattern> PATTERN_CACHE = new HashMap<>();
 
     private static final String NBT_SLOT = "Slot_%d";
     private static final String NBT_OREDICT = "Oredict";
@@ -52,9 +52,9 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
         return getUnlocalizedName();
     }
 
-    public static RSExtremePattern getPatternFromCache(World world, ItemStack stack) {
+    public static ExtremePattern getPatternFromCache(World world, ItemStack stack) {
         if(!PATTERN_CACHE.containsKey(stack)) {
-            PATTERN_CACHE.put(stack, new RSExtremePattern(world, null, stack));
+            PATTERN_CACHE.put(stack, new ExtremePattern(world, null, stack));
         }
         return PATTERN_CACHE.get(stack);
     }
@@ -158,7 +158,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     @Nonnull
     @Override
     public ICraftingPattern create(World world, ItemStack stack, ICraftingPatternContainer container) {
-        return new RSExtremePattern(world, container, stack);
+        return new ExtremePattern(world, container, stack);
     }
 
 

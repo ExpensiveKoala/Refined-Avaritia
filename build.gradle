@@ -62,10 +62,6 @@ dependencies {
 	//compile "codechicken:CodeChickenLib:${config.mc_version}-${config.ccl_version}:deobf"
     deobfCompile "MCMultiPart2:MCMultiPart:2.4.1"
 	
-	deobfCompile "appeng:appliedenergistics2:rv5-stable-7"{
-        exclude module: "jei_${minecraftVersion}"
-    }
-	
 	compile "refinedstorage:refinedstorage:1.5.30+:deobf"
 	//runtime "refinedstorage:refinedstorage:1.2.25+"
 	

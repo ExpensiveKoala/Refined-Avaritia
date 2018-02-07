@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RSExtremePattern implements ICraftingPattern {
+public class ExtremePattern implements ICraftingPattern {
 
     private ICraftingPatternContainer container;
     private ItemStack stack;
@@ -32,7 +32,7 @@ public class RSExtremePattern implements ICraftingPattern {
     private List<ItemStack> outputs = new ArrayList<>();
     private List<ItemStack> byproducts = new ArrayList<>();
 
-    public RSExtremePattern(World world, ICraftingPatternContainer container, ItemStack stack) {
+    public ExtremePattern(World world, ICraftingPatternContainer container, ItemStack stack) {
         this.container = container;
         this.stack = Comparer.stripTags(stack);
 

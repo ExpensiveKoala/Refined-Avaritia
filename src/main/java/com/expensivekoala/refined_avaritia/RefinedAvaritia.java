@@ -1,6 +1,8 @@
 package com.expensivekoala.refined_avaritia;
 
 import com.expensivekoala.refined_avaritia.proxy.CommonProxy;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -15,8 +17,8 @@ public class RefinedAvaritia {
     public static final String MODID = "refined_avaritia";
     public static final String MODNAME = "Refined Avaritia";
     public static final String VERSION = "2.0";
-    public static final String DEPENDENCIES = "after:refinedstorage@[1.5.30,);after:avaritia@[3.2,);" +
-            "after:extendedcrafting@[1.2.0,);after:appliedenergistics2@[r5-stable-7,)";
+    public static final String DEPENDENCIES = "required-after:refinedstorage@[1.5.30,);after:avaritia@[3.2,);" +
+            "after:extendedcrafting@[1.2.0,)";
 
     @SidedProxy(clientSide = "com.expensivekoala.refined_avaritia.proxy.ClientProxy", serverSide = "com.expensivekoala.refined_avaritia.proxy.CommonProxy")
     public static CommonProxy proxy;
@@ -25,6 +27,13 @@ public class RefinedAvaritia {
     public static RefinedAvaritia instance;
 
     public static Logger logger;
+
+    public CreativeTabs tab = new CreativeTabs(RefinedAvaritia.MODID) {
+        @Override
+        public ItemStack getTabIconItem() {
+            return new ItemStack(Registry.EXTREME_PATTERN_ENCODER);
+        }
+    };
 
     public SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
 
