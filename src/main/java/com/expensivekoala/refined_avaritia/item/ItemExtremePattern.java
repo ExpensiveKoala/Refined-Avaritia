@@ -41,7 +41,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     public ItemExtremePattern() {
         setRegistryName(RefinedAvaritia.MODID, "extreme_pattern");
-        setCreativeTab(RS.INSTANCE.tab);
+        setCreativeTab(RefinedAvaritia.instance.tab);
     }
 
     @Override

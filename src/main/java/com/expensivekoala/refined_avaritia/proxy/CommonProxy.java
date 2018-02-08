@@ -8,8 +8,10 @@ import com.expensivekoala.refined_avaritia.network.MessageCreateExtremePattern;
 import com.expensivekoala.refined_avaritia.network.MessageSetOredictExtremePattern;
 import com.expensivekoala.refined_avaritia.network.MessageTransferAvaritiaRecipe;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
+import com.expensivekoala.refined_avaritia.util.PatternEventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -32,6 +34,7 @@ public class CommonProxy {
     public void init(FMLInitializationEvent e)
     {
         NetworkRegistry.INSTANCE.registerGuiHandler(RefinedAvaritia.instance, new GuiHandler());
+        MinecraftForge.EVENT_BUS.register(new PatternEventHandler());
     }
 
     public void postInit(FMLPostInitializationEvent e)
