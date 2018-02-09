@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -45,16 +46,20 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event)
     {
-        event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER);
+        if(Loader.isModLoaded("avaritia")) {
+            event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER);
 
-        GameRegistry.registerTileEntity(TileExtremePatternEncoder.class, RefinedAvaritia.MODID + ":extreme_pattern_encoder");
+            GameRegistry.registerTileEntity(TileExtremePatternEncoder.class, RefinedAvaritia.MODID + ":extreme_pattern_encoder");
+        }
     }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(Registry.PATTERN);
-        event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER.createItem());
+        if(Loader.isModLoaded("avaritia")) {
+            event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER.createItem());
+        }
     }
 }
 

@@ -23,6 +23,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -64,6 +65,9 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         if(!stack.hasTagCompound()) {
+            if(Loader.isModLoaded("extendedcrafting")) {
+                tooltip.add(TextFormatting.GREEN + I18n.format("misc.refined_avaritia:extended_pattern") + TextFormatting.RESET);
+            }
             return;
         }
 
@@ -163,8 +167,13 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-        if(!worldIn.isRemote && playerIn.isSneaking())
+        if(!worldIn.isRemote && playerIn.isSneaking()) {
             return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Registry.PATTERN, playerIn.getHeldItem(handIn).getCount()));
+        } else if(!worldIn.isRemote && playerIn.getHeldItem(handIn).hasTagCompound()) {
+            ItemStack stack = playerIn.getHeldItem(handIn);
+            setOredict(stack, !isOredict(stack));
+            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        }
         return new ActionResult<>(EnumActionResult.PASS, playerIn.getHeldItem(handIn));
     }
 

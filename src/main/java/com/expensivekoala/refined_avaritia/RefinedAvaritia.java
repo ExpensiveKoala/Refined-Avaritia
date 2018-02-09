@@ -31,7 +31,7 @@ public class RefinedAvaritia {
     public CreativeTabs tab = new CreativeTabs(RefinedAvaritia.MODID) {
         @Override
         public ItemStack getTabIconItem() {
-            return new ItemStack(Registry.EXTREME_PATTERN_ENCODER);
+            return new ItemStack(Registry.PATTERN);
         }
     };
 
