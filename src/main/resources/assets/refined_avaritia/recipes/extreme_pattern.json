@@ -2,6 +2,12 @@
   "result": {
     "item": "refined_avaritia:extreme_pattern"
   },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "avaritia"
+    }
+  ],
   "pattern": [
     "gpg",
     "pgp",
