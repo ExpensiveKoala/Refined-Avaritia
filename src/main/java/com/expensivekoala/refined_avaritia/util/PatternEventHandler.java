@@ -60,8 +60,8 @@ public class PatternEventHandler {
         ItemExtremePattern.setType(pattern, type);
 
         for (int i = 0; i < type.height * type.width; i++) {
-            ItemStack ingredient = recipe.getStackInSlot(i);
-
+            ItemStack ingredient = recipe.getStackInSlot(i).copy();
+            ingredient.setCount(1);
             if(!ingredient.isEmpty()) {
                 ItemExtremePattern.setSlot(pattern, i, ingredient);
             }
