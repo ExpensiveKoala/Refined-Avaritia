@@ -44,32 +44,49 @@ repositories {
     url "http://tehnut.info/maven"
   }
   maven {
-	url "https://dl.bintray.com/raoulvdberge/dev"
+	url "https://repo.raoulvdberge.com/"
   }
   maven {
     name = "JitPack"
     url = "https://jitpack.io"
   }
+  maven {
+    name = "Covers"
+    url = "http://maven.covers1624.net/"
+  }
+  maven {
+    name = "CB Maven"
+    url = "http://chickenbones.net/maven"
+  }
+  maven {
+    name = "CraftTweaker Maven"
+    url = "http://maven.blamejared.com"
+  }
 }
 
 minecraft {
-    version = "1.12.2-14.23.1.2555"
+    version = "1.12.2-14.23.4.2718"
     runDir = "run"
-	mappings = "snapshot_20171003"
+	mappings = "snapshot_20180714"
 }
 
 dependencies {	
-	//compile "codechicken:CodeChickenLib:${config.mc_version}-${config.ccl_version}:deobf"
+	deobfCompile "codechicken:CodeChickenLib:1.12.2-+:universal"
     deobfCompile "MCMultiPart2:MCMultiPart:2.4.1"
 	
-	compile "refinedstorage:refinedstorage:1.5.30+:deobf"
+	compile "refinedstorage:refinedstorage:1.6.1-+"
 	//runtime "refinedstorage:refinedstorage:1.2.25+"
 	
 	deobfProvided "mezz.jei:jei_${config.mc_version}:${config.jei_version}:api"
 	runtime "mezz.jei:jei_${config.mc_version}:${config.jei_version}"
 	
 	deobfCompile "mcp.mobius.waila:Hwyla:1.8.23-B38_1.12"
-	//deobfCompile "com.github.BlakeBr0:ExtendedCrafting:880c4c8"
+	//deobfCompile "com.github.BlakeBr0:ExtendedCrafting:0a74ba7"
+    //deobfCompile "com.github.BlakeBr0:Cucumber:6d04dfc
+    deobfCompile "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.+"
+    deobfCompile("morph.avaritia:Avaritia:1.12-+:universal") {
+        transitive = false
+    }
 }
 processResources
 {

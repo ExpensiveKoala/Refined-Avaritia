@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.Loader;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ItemExtremePattern extends Item implements ICraftingPatternProvider{
 
@@ -46,13 +47,13 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     }
 
     @Override
-    public String getUnlocalizedName() {
+    public String getTranslationKey() {
         return "item." + RefinedAvaritia.MODID + ":extreme_pattern";
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
-        return getUnlocalizedName();
+    public String getTranslationKey(ItemStack stack) {
+        return getTranslationKey();
     }
 
     public static ExtremePattern getPatternFromCache(World world, ItemStack stack) {
@@ -77,12 +78,12 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
             if (GuiScreen.isShiftKeyDown()) {
                 tooltip.add(TextFormatting.YELLOW + I18n.format("misc.refinedstorage:pattern.inputs") + TextFormatting.RESET);
 
-                combineItems(tooltip, true, StackUtils.toNonNullList(pattern.getInputs()));
+                combineItems(tooltip, true, pattern.getInputs().stream().map(i -> i.size() > 0 ? i.get(0) : ItemStack.EMPTY).collect(Collectors.toList()));
 
                 tooltip.add(TextFormatting.YELLOW + I18n.format("misc.refinedstorage:pattern.outputs") + TextFormatting.RESET);
             }
 
-            combineItems(tooltip, true, StackUtils.toNonNullList(pattern.getOutputs()));
+            combineItems(tooltip, true, pattern.getOutputs());
 
             if (isOredict(stack)) {
                 tooltip.add(TextFormatting.BLUE + I18n.format("misc.refinedstorage:pattern.oredict") + TextFormatting.RESET);
@@ -139,7 +140,8 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
         return pattern.hasTagCompound() && pattern.getTagCompound().hasKey(NBT_TYPE) ? RecipeType.values()[pattern.getTagCompound().getInteger(NBT_TYPE)] : null;
     }
 
-    public static void combineItems(List<String> tooltip, boolean displayAmount, NonNullList<ItemStack> stacks) {
+
+    public static void combineItems(List<String> tooltip, boolean displayAmount, List<ItemStack> stacks) {
         Set<Integer> combinedIndices = new HashSet<>();
 
         for (int i = 0; i < stacks.size(); ++i) {

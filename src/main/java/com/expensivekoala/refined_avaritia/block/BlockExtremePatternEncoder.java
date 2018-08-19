@@ -32,7 +32,7 @@ public class BlockExtremePatternEncoder extends Block implements ITileEntityProv
     }
 
     @Override
-    public String getUnlocalizedName() {
+    public String getTranslationKey() {
         return "block." + RefinedAvaritia.MODID + ":extreme_pattern_encoder";
     }
 

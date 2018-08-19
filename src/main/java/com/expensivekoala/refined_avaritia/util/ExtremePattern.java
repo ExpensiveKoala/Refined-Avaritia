@@ -19,7 +19,9 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
@@ -33,21 +35,24 @@ public class ExtremePattern implements ICraftingPattern {
     private IExtremeRecipe avaritiaRecipe;
     private IRecipe extendedRecipe;
     private RecipeType recipeType;
-    private List<ItemStack> inputs = new ArrayList<>();
-    private List<List<ItemStack>> oreInputs = new ArrayList<>();
-    private List<ItemStack> outputs = new ArrayList<>();
-    private List<ItemStack> byproducts = new ArrayList<>();
+    private boolean processing;
+    private boolean oredict;
+    private boolean valid;
+    private List<NonNullList<ItemStack>> inputs = new ArrayList<>();
+    private NonNullList<ItemStack> outputs = NonNullList.create();
+    private NonNullList<ItemStack> byproducts = NonNullList.create();
 
     public ExtremePattern(World world, ICraftingPatternContainer container, ItemStack stack) {
         this.container = container;
-        if(stack.hasTagCompound() && stack.getTagCompound().hasKey(ItemExtremePattern.NBT_TYPE)) {
+        if (stack.hasTagCompound() && stack.getTagCompound().hasKey(ItemExtremePattern.NBT_TYPE)) {
             this.recipeType = ItemExtremePattern.getType(stack);
-        }
-        else {
+        } else {
             RefinedAvaritia.logger.warn("Assuming Avaritia recipe. If you see this message, remake your pattern.");
             this.recipeType = RecipeType.AVARITIA;
         }
-        this.stack = Comparer.stripTags(stack);
+        this.stack = stack;
+        this.processing = false;
+        this.oredict = ItemExtremePattern.isOredict(stack);
 
         InventoryCrafting inv = new InventoryCrafting(new Container() {
             @Override
@@ -59,7 +64,7 @@ public class ExtremePattern implements ICraftingPattern {
         for (int i = 0; i < (recipeType.width * recipeType.height); ++i) {
             ItemStack slot = ItemExtremePattern.getSlot(stack, i);
 
-            inputs.add(Comparer.stripTags(slot));
+            inputs.add(slot == null ? NonNullList.create() : NonNullList.from(ItemStack.EMPTY, slot));
 
             if (slot != null) {
                 inv.setInventorySlotContents(i, slot);
@@ -67,7 +72,7 @@ public class ExtremePattern implements ICraftingPattern {
         }
 
         if (!ItemPattern.isProcessing(stack)) {
-            if(recipeType == RecipeType.AVARITIA) {
+            if (recipeType == RecipeType.AVARITIA) {
                 for (IExtremeRecipe r : AvaritiaRecipeManager.EXTREME_RECIPES.values()) {
                     if (r.matches(inv, world)) {
                         avaritiaRecipe = r;
@@ -76,8 +81,8 @@ public class ExtremePattern implements ICraftingPattern {
                 }
             } else {
                 for (Object o : TableRecipeManager.getInstance().getRecipes()) {
-                    IRecipe r = (IRecipe)o;
-                    if(r.matches(inv, world)) {
+                    IRecipe r = (IRecipe) o;
+                    if (r.matches(inv, world)) {
                         extendedRecipe = r;
                         break;
                     }
@@ -88,65 +93,27 @@ public class ExtremePattern implements ICraftingPattern {
                 ItemStack output = recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getCraftingResult(inv) : extendedRecipe.getCraftingResult(inv);
 
                 if (!output.isEmpty()) {
-                    outputs.add(Comparer.stripTags(output.copy()));
+                    valid = true;
+                    outputs.add(output.copy());
+                    byproducts = recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getRemainingItems(inv) : extendedRecipe.getRemainingItems(inv);
 
-                    if (isOredict()) {
-                        List<List<ItemStack>> inputs = new LinkedList<>();
-
-                        for (Ingredient ingredient : recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getIngredients() : extendedRecipe.getIngredients()) {
-                            inputs.add(Arrays.asList(ingredient.getMatchingStacks()));
+                    if (oredict) {
+                        int size = 0;
+                        if (recipeType == RecipeType.AVARITIA && avaritiaRecipe != null) {
+                            size = avaritiaRecipe.getIngredients().size();
+                        } else if (extendedRecipe != null) {
+                            size = extendedRecipe.getIngredients().size();
+                        } else {
+                            valid = false;
                         }
-
-                        for (List<ItemStack> input : inputs) {
-                            if (input.isEmpty()) {
-                                oreInputs.add(Collections.emptyList());
-                            } else {
-                                List<ItemStack> cleaned = new LinkedList<>();
-                                for (ItemStack in : input) {
-                                    cleaned.add(Comparer.stripTags(in.copy()));
-                                }
-                                oreInputs.add(cleaned);
+                        if (size > 0) {
+                            inputs.clear();
+                            for (Ingredient ingredient : recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getIngredients() : extendedRecipe.getIngredients()) {
+                                inputs.add(NonNullList.from(ItemStack.EMPTY, ingredient.getMatchingStacks()));
                             }
+                        } else {
+                            valid = false;
                         }
-                    }
-
-                    for (ItemStack remaining : recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getRemainingItems(inv) : extendedRecipe.getRemainingItems(inv)) {
-                        if (!remaining.isEmpty()) {
-                            ItemStack cleaned = Comparer.stripTags(remaining.copy());
-                            byproducts.add(cleaned);
-                        }
-                    }
-                }
-            }
-        } else {
-            outputs = ItemPattern.getOutputs(stack);
-        }
-
-        if (oreInputs.isEmpty()) {
-            for (ItemStack input : inputs) {
-                if (input == null || input.isEmpty()) {
-                    oreInputs.add(Collections.emptyList());
-                } else {
-                    int[] ids = OreDictionary.getOreIDs(input);
-
-                    if (ids.length == 0) {
-                        oreInputs.add(Collections.singletonList(Comparer.stripTags(input)));
-                    } else if (isOredict()) {
-                        List<ItemStack> oredictInputs = Arrays.stream(ids)
-                                .mapToObj(OreDictionary::getOreName)
-                                .map(OreDictionary::getOres)
-                                .flatMap(List::stream)
-                                .map(ItemStack::copy)
-                                .map(Comparer::stripTags)
-                                .peek(s -> s.setCount(input.getCount()))
-                                .collect(Collectors.toList());
-
-                        // Add original stack as first, should prevent some issues
-                        oredictInputs.add(0, Comparer.stripTags(input.copy()));
-
-                        oreInputs.add(oredictInputs);
-                    } else {
-                        oreInputs.add(Collections.singletonList(Comparer.stripTags(input)));
                     }
                 }
             }
@@ -154,93 +121,36 @@ public class ExtremePattern implements ICraftingPattern {
     }
 
     @Override
-    public ICraftingPatternContainer getContainer()
-        {
-            return container;
-        }
+    public ICraftingPatternContainer getContainer() {
+        return container;
+    }
 
     @Override
-    public ItemStack getStack()
-        {
-            return stack;
-        }
+    public ItemStack getStack() {
+        return stack;
+    }
 
     @Override
     public boolean isValid() {
-        return !inputs.isEmpty() && inputs.stream().filter(Objects::nonNull).count() > 0 && !outputs.isEmpty();
+        return valid;
     }
 
     @Override
-    public boolean isProcessing()
-        {
-            return false;
-        }
-
-    @Override
-    public boolean isOredict()
-        {
-            return ItemExtremePattern.isOredict(stack);
-        }
-
-    @Override
-    public boolean isBlocking() {
-        return ItemPattern.isBlocking(stack);
+    public boolean isProcessing() {
+        return false;
     }
 
     @Override
-    public List<ItemStack> getInputs()
-        {
-            return inputs;
-        }
-
-    @Override
-    public List<List<ItemStack>> getOreInputs()
-        {
-            return oreInputs;
-        }
-
-    @Nullable
-    @Override
-    public List<ItemStack> getOutputs(ItemStack[] itemStacks)
-    {
-        List<ItemStack> outputs = new ArrayList<>();
-
-        InventoryCrafting inv = new InventoryCrafting(new Container() {
-            @Override
-            public boolean canInteractWith(EntityPlayer playerIn) {
-                return false;
-            }
-        }, recipeType.width, recipeType.height);
-
-        for (int i = 0; i < (recipeType.width * recipeType.height) && i < itemStacks.length; i++) {
-            if(itemStacks[i] == null) {
-                inv.setInventorySlotContents(i, ItemStack.EMPTY);
-            }
-            else {
-                inv.setInventorySlotContents(i, itemStacks[i]);
-            }
-        }
-
-        ItemStack cleaned = recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getCraftingResult(inv) : extendedRecipe.getCraftingResult(inv);
-        if(cleaned.isEmpty()) {
-            return null;
-        }
-        outputs.add(cleaned.copy());
-
-        return outputs;
-
+    public boolean isOredict() {
+        return oredict;
     }
 
-    @Override
-    public List<ItemStack> getOutputs()
-        {
-            return outputs;
-        }
 
     @Override
-    public List<ItemStack> getByproducts(ItemStack[] itemStacks)
-    {
-        List<ItemStack> byproducts = new ArrayList<>();
+    public NonNullList<ItemStack> getByproducts(NonNullList<ItemStack> took) {
+        if (took.size() != inputs.size()) {
+            throw new IllegalArgumentException("The items that are taken (" + took.size() + ") should match the inputs for this pattern (" + inputs.size() + ")");
+        }
 
         InventoryCrafting inv = new InventoryCrafting(new Container() {
             @Override
@@ -249,94 +159,147 @@ public class ExtremePattern implements ICraftingPattern {
             }
         }, recipeType.width, recipeType.height);
 
-        for (int i = 0; i < (recipeType.width * recipeType.height) && i < itemStacks.length; ++i) {
-            if(itemStacks[i] == null) {
-                inv.setInventorySlotContents(i, ItemStack.EMPTY);
-            }
-            else {
-                inv.setInventorySlotContents(i, itemStacks[i]);
+        for (int i = 0; i < took.size(); ++i) {
+            inv.setInventorySlotContents(i, took.get(i));
+        }
+
+        NonNullList<ItemStack> remainingItems = recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getRemainingItems(inv) : extendedRecipe.getRemainingItems(inv);
+        NonNullList<ItemStack> sanitized = NonNullList.create();
+
+        for (ItemStack item : remainingItems) {
+            if (!item.isEmpty()) {
+                sanitized.add(item);
             }
         }
 
-        for (ItemStack remaining : recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getRemainingItems(inv) : extendedRecipe.getRemainingItems(inv)) {
-            if (!remaining.isEmpty()) {
-                byproducts.add(remaining.copy());
-            }
+        return sanitized;
+    }
+
+    @Override
+    public String getId() {
+        return CraftingTaskFactory.ID;
+    }
+
+    @Override
+    public List<NonNullList<ItemStack>> getInputs() {
+        return inputs;
+    }
+
+    @Override
+    public NonNullList<ItemStack> getOutputs() {
+        return outputs;
+    }
+
+    @Override
+    public ItemStack getOutput(NonNullList<ItemStack> took) {
+
+
+        if (took.size() != inputs.size()) {
+            throw new IllegalArgumentException("The items that are taken (" + took.size() + ") should match the inputs for this pattern (" + inputs.size() + ")");
         }
+
+        InventoryCrafting inv = new InventoryCrafting(new Container() {
+            @Override
+            public boolean canInteractWith(EntityPlayer player) {
+                return false;
+            }
+        }, recipeType.width, recipeType.height);
+
+        for (int i = 0; i < took.size(); ++i) {
+            inv.setInventorySlotContents(i, took.get(i));
+        }
+
+        ItemStack result = recipeType == RecipeType.AVARITIA ? avaritiaRecipe.getCraftingResult(inv) : extendedRecipe.getCraftingResult(inv);
+        if (result.isEmpty()) {
+            throw new IllegalStateException("Cannot have empty result");
+        }
+
+        return result;
+    }
+
+    @Override
+    public NonNullList<ItemStack> getByproducts() {
         return byproducts;
     }
 
     @Override
-    public List<ItemStack> getByproducts()
-        {
-            return byproducts;
-        }
-
-    @Override
-    public String getId()
-        {
-            return CraftingTaskFactory.ID;
-        }
-
-    @Override
-    public int getQuantityPerRequest(ItemStack itemStack, int i)
-    {
-        int quantity = 0;
-        itemStack = Comparer.stripTags(itemStack.copy());
-        for(ItemStack output : outputs) {
-            if(API.instance().getComparer().isEqual(itemStack, output, i)) {
-                quantity += output.getCount();
-            }
-        }
-        return quantity;
+    public NonNullList<FluidStack> getFluidInputs() {
+        return NonNullList.create();
     }
 
     @Override
-    public ItemStack getActualOutput(ItemStack itemStack, int i)
-    {
-        itemStack = Comparer.stripTags(itemStack.copy());
-        for(ItemStack output : outputs) {
-            if(API.instance().getComparer().isEqual(itemStack, output, i)) {
-                return output.copy();
-            }
-        }
-        return ItemStack.EMPTY;
+    public NonNullList<FluidStack> getFluidOutputs() {
+        return NonNullList.create();
     }
 
     @Override
-    public boolean alike(ICraftingPattern other) {
-        if (other == this) {
-            return true;
+    public boolean canBeInChainWith(ICraftingPattern other) {
+        if (other.isProcessing() || other.isOredict() != oredict) {
+            return false;
         }
 
-        if (other.getId().equals(this.getId())
-                && other.isOredict() == this.isOredict()
-                && other.isBlocking() == this.isBlocking()
-                && other.isProcessing() == this.isProcessing()
-                && other.getOreInputs().size() == this.getOreInputs().size()
-                && other.getOutputs().size() == this.getOutputs().size()) {
-            boolean same = true;
-            for (int i = 0; i < other.getOreInputs().size(); i++) {
-                same &= other.getOreInputs().get(i).size() == this.getOreInputs().get(i).size();
+        if ((other.getInputs().size() != inputs.size()) ||
+          (other.getFluidInputs().size() > 0) ||
+          (other.getOutputs().size() != outputs.size()) ||
+          (other.getFluidOutputs().size() > 0)) {
+            return false;
+        }
+
+        if (other.getByproducts().size() != byproducts.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < inputs.size(); ++i) {
+            List<ItemStack> inputs = this.inputs.get(i);
+            List<ItemStack> otherInputs = other.getInputs().get(i);
+
+            if (inputs.size() != otherInputs.size()) {
+                return false;
             }
-            int j = 0;
-            while (same && j < other.getOutputs().size()) {
-                same = ItemStack.areItemStacksEqual(other.getOutputs().get(j), this.getOutputs().get(j));
-                j++;
-            }
-            int i = 0;
-            while (same && i < other.getOreInputs().size()) {
-                List<ItemStack> otherList = other.getOreInputs().get(i);
-                List<ItemStack> thisList = this.getOreInputs().get(i);
-                j = 0;
-                while (same && j < otherList.size()) {
-                    same = ItemStack.areItemStacksEqual(otherList.get(j), thisList.get(j));
-                    j++;
+
+            for (int j = 0; j < inputs.size(); ++j) {
+                if (!API.instance().getComparer().isEqual(inputs.get(j), otherInputs.get(j))) {
+                    return false;
                 }
-                i++;
             }
-            return same;
         }
-        return false;
+
+        for (int i = 0; i < outputs.size(); ++i) {
+            if (!API.instance().getComparer().isEqual(outputs.get(i), other.getOutputs().get(i))) {
+                return false;
+            }
+        }
+
+
+        for (int i = 0; i < byproducts.size(); ++i) {
+            if (!API.instance().getComparer().isEqual(byproducts.get(i), other.getByproducts().get(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int getChainHashCode() {
+        int result = 0;
+
+        result = 31 * result + (oredict ? 1 : 0);
+
+        for (List<ItemStack> inputs : this.inputs) {
+            for (ItemStack input : inputs) {
+                result = 31 * result + API.instance().getItemStackHashCode(input);
+            }
+        }
+
+        for (ItemStack output : this.outputs) {
+            result = 31 * result + API.instance().getItemStackHashCode(output);
+        }
+
+        for (ItemStack byproduct : this.byproducts) {
+            result = 31 * result + API.instance().getItemStackHashCode(byproduct);
+        }
+
+        return result;
     }
 }

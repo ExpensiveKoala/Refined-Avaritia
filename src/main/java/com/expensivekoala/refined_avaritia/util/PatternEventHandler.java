@@ -1,7 +1,6 @@
 package com.expensivekoala.refined_avaritia.util;
 
 import com.blakebr0.extendedcrafting.block.ModBlocks;
-import com.blakebr0.extendedcrafting.crafting.table.basic.BasicStackHandler;
 import com.blakebr0.extendedcrafting.tile.TileAdvancedCraftingTable;
 import com.blakebr0.extendedcrafting.tile.TileBasicCraftingTable;
 import com.blakebr0.extendedcrafting.tile.TileEliteCraftingTable;
