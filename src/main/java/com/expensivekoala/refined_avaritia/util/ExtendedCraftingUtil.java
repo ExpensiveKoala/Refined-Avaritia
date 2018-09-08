@@ -41,6 +41,7 @@ public class ExtendedCraftingUtil {
                       RecipeType.EC_ULTIMATE);
                 }
             }
+            event.setCanceled(true);
         }
     }
 }

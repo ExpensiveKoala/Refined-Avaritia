@@ -14,7 +14,6 @@ public class PatternEventHandler {
         if(!event.getWorld().isRemote) {
             if(Loader.isModLoaded("extendedcrafting")) {
                 ExtendedCraftingUtil.handlePatternRightClick(event);
-                event.setCanceled(true);
             }
         }
     }
