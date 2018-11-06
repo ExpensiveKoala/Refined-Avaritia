@@ -21,27 +21,30 @@ public class ExtendedCraftingUtil {
                     PatternEventHandler.setRecipe(event.getEntityPlayer().getHeldItem(event.getHand()),
                       ((TileBasicCraftingTable)event.getWorld().getTileEntity(event.getPos())).getMatrix(),
                       RecipeType.EC_BASIC);
+                    event.setCanceled(true);
                 }
             } else if(event.getWorld().getBlockState(event.getPos()).getBlock() == ModBlocks.blockAdvancedTable) {
                 if(!((TileAdvancedCraftingTable)event.getWorld().getTileEntity(event.getPos())).getResult().isEmpty()) {
                     PatternEventHandler.setRecipe(event.getEntityPlayer().getHeldItem(event.getHand()),
                       ((TileAdvancedCraftingTable)event.getWorld().getTileEntity(event.getPos())).getMatrix(),
                       RecipeType.EC_ADVANCED);
+                    event.setCanceled(true);
                 }
             } else if(event.getWorld().getBlockState(event.getPos()).getBlock() == ModBlocks.blockEliteTable) {
                 if(!((TileEliteCraftingTable)event.getWorld().getTileEntity(event.getPos())).getResult().isEmpty()) {
                     PatternEventHandler.setRecipe(event.getEntityPlayer().getHeldItem(event.getHand()),
                       ((TileEliteCraftingTable)event.getWorld().getTileEntity(event.getPos())).getMatrix(),
                       RecipeType.EC_ELITE);
+                    event.setCanceled(true);
                 }
             } else if(event.getWorld().getBlockState(event.getPos()).getBlock() == ModBlocks.blockUltimateTable) {
                 if(!((TileUltimateCraftingTable)event.getWorld().getTileEntity(event.getPos())).getResult().isEmpty()) {
                     PatternEventHandler.setRecipe(event.getEntityPlayer().getHeldItem(event.getHand()),
                       ((TileUltimateCraftingTable)event.getWorld().getTileEntity(event.getPos())).getMatrix(),
                       RecipeType.EC_ULTIMATE);
+                    event.setCanceled(true);
                 }
             }
-            event.setCanceled(true);
         }
     }
 }

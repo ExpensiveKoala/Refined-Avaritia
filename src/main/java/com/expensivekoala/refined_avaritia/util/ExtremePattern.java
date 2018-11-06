@@ -1,6 +1,5 @@
 package com.expensivekoala.refined_avaritia.util;
 
-import com.blakebr0.extendedcrafting.crafting.table.ITieredRecipe;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
@@ -8,10 +7,8 @@ import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPattern;
 import com.raoulvdberge.refinedstorage.api.autocrafting.ICraftingPatternContainer;
 import com.raoulvdberge.refinedstorage.apiimpl.API;
 import com.raoulvdberge.refinedstorage.apiimpl.autocrafting.registry.CraftingTaskFactory;
-import com.raoulvdberge.refinedstorage.apiimpl.util.Comparer;
 import com.raoulvdberge.refinedstorage.item.ItemPattern;
 import morph.avaritia.recipe.AvaritiaRecipeManager;
-import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import morph.avaritia.recipe.extreme.IExtremeRecipe;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -22,11 +19,9 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.oredict.OreDictionary;
 
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExtremePattern implements ICraftingPattern {
 
@@ -47,7 +42,7 @@ public class ExtremePattern implements ICraftingPattern {
         if (stack.hasTagCompound() && stack.getTagCompound().hasKey(ItemExtremePattern.NBT_TYPE)) {
             this.recipeType = ItemExtremePattern.getType(stack);
         } else {
-            RefinedAvaritia.logger.warn("Assuming Avaritia recipe. If you see this message, remake your pattern.");
+            RefinedAvaritia.logger.warn("Assuming Avaritia recipe. If you see this message, remake your pattern. " + stack);
             this.recipeType = RecipeType.AVARITIA;
         }
         this.stack = stack;
@@ -116,6 +111,7 @@ public class ExtremePattern implements ICraftingPattern {
                         }
                     }
                 }
+                System.out.println(valid + " : " + output);
             }
         }
     }

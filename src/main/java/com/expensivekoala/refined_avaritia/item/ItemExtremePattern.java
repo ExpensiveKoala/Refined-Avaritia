@@ -27,14 +27,14 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ItemExtremePattern extends Item implements ICraftingPatternProvider{
+public class ItemExtremePattern extends Item implements ICraftingPatternProvider {
 
     /**
      * Blatantly copying Refined Storage <3
      */
     private static Map<ItemStack, ExtremePattern> PATTERN_CACHE = new HashMap<>();
 
-    private static final String NBT_SLOT = "Slot_%d";
+    private static final String NBT_SLOT = "Input_%d";
     private static final String NBT_OREDICT = "Oredict";
     public static final String NBT_TYPE = "Type";
 
@@ -54,7 +54,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     }
 
     public static ExtremePattern getPatternFromCache(World world, ItemStack stack) {
-        if(!PATTERN_CACHE.containsKey(stack)) {
+        if (!PATTERN_CACHE.containsKey(stack)) {
             PATTERN_CACHE.put(stack, new ExtremePattern(world, null, stack));
         }
         return PATTERN_CACHE.get(stack);
@@ -62,8 +62,8 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        if(!stack.hasTagCompound()) {
-            if(Loader.isModLoaded("extendedcrafting")) {
+        if (!stack.hasTagCompound()) {
+            if (Loader.isModLoaded("extendedcrafting")) {
                 tooltip.add(TextFormatting.GREEN + I18n.format("misc.refined_avaritia:extended_pattern") + TextFormatting.RESET);
             }
             return;
@@ -105,11 +105,17 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     public static ItemStack getSlot(ItemStack pattern, int slot) {
         String id = String.format(NBT_SLOT, slot);
+        String idLegacy = String.format("Slot_%d", slot);
 
-        if (!pattern.hasTagCompound() || !pattern.getTagCompound().hasKey(id)) {
+        if (!pattern.hasTagCompound()) {
             return ItemStack.EMPTY;
         }
-
+        if (!pattern.getTagCompound().hasKey(idLegacy) && !pattern.getTagCompound().hasKey(id)) {
+            return ItemStack.EMPTY;
+        }
+        if (pattern.getTagCompound().hasKey(idLegacy)) {
+            return new ItemStack(pattern.getTagCompound().getCompoundTag(idLegacy));
+        }
         return new ItemStack(pattern.getTagCompound().getCompoundTag(id));
     }
 
@@ -126,7 +132,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
     }
 
     public static void setType(ItemStack pattern, RecipeType type) {
-        if(!pattern.hasTagCompound()) {
+        if (!pattern.hasTagCompound()) {
             pattern.setTagCompound(new NBTTagCompound());
         }
 
@@ -157,7 +163,7 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
                     }
                 }
 
-                data = (displayAmount ? (TextFormatting.WHITE + String.valueOf(amount) + " ") : "") + TextFormatting.GRAY + data;
+                data = TextFormatting.GRAY + (displayAmount ? (String.valueOf(amount) + "x ") : "") + data;
 
                 tooltip.add(data);
             }
@@ -166,9 +172,9 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-        if(!worldIn.isRemote && playerIn.isSneaking()) {
+        if (!worldIn.isRemote && playerIn.isSneaking()) {
             return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Registry.PATTERN, playerIn.getHeldItem(handIn).getCount()));
-        } else if(!worldIn.isRemote && playerIn.getHeldItem(handIn).hasTagCompound()) {
+        } else if (!worldIn.isRemote && playerIn.getHeldItem(handIn).hasTagCompound()) {
             ItemStack stack = playerIn.getHeldItem(handIn);
             setOredict(stack, !isOredict(stack));
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
