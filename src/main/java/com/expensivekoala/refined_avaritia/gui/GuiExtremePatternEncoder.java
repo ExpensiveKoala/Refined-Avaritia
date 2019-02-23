@@ -1,35 +1,46 @@
 package com.expensivekoala.refined_avaritia.gui;
 
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
+import com.expensivekoala.refined_avaritia.gui.slots.SlotPhantom;
 import com.expensivekoala.refined_avaritia.network.MessageClearExtremePattern;
 import com.expensivekoala.refined_avaritia.network.MessageCreateExtremePattern;
 import com.expensivekoala.refined_avaritia.network.MessageSetOredictExtremePattern;
+import com.expensivekoala.refined_avaritia.network.MessageSetTableSize;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
+import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil;
+import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil.TableSize;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.client.config.GuiUtils;
+import net.minecraftforge.fml.common.Loader;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GuiExtremePatternEncoder extends GuiContainer{
+public class GuiExtremePatternEncoder extends GuiContainer {
     private static final Map<String, ResourceLocation> TEXTURE_CACHE = new HashMap<>();
 
+    private static final String GUI_TEXTURE = "gui/extreme_pattern_encoder.png";
+    private static final String GUI_BUTTON = "gui/button.png";
 
     int screenWidth, screenHeight, lastButtonId;
+    TableSize selectedTable = TableSize.ULTIMATE;
     TileExtremePatternEncoder tile;
     GuiCheckBox oredictPattern;
+
     public GuiExtremePatternEncoder(ContainerExtremePatternEncoder container, TileExtremePatternEncoder tile) {
         super(container);
         this.screenHeight = 256;
@@ -46,8 +57,8 @@ public class GuiExtremePatternEncoder extends GuiContainer{
         lastButtonId = 0;
 
         oredictPattern = addCheckBox(guiLeft + 175, guiTop + 156, I18n.format("misc.refined_avaritia:oredict"), tile.getOredictPattern());
+        this.selectedTable = tile.getTableSize();
     }
-
 
 
     @Override
@@ -79,15 +90,45 @@ public class GuiExtremePatternEncoder extends GuiContainer{
         return inBounds(176, 8, 7, 7, mouseX, mouseY);
     }
 
+    private boolean isOverBasic(int mouseX, int mouseY) {
+        return inBounds(-14, 173, 50, 32, mouseX, mouseY);
+    }
+
+    private boolean isOverAdvanced(int mouseX, int mouseY) {
+        return inBounds(202, 173, 50, 32, mouseX, mouseY);
+    }
+
+    private boolean isOverElite(int mouseX, int mouseY) {
+        return inBounds(-14, 210, 50, 32, mouseX, mouseY);
+    }
+
+    private boolean isOverUltimate(int mouseX, int mouseY) {
+        return inBounds(202, 210, 50, 32, mouseX, mouseY);
+    }
+
     public boolean inBounds(int x, int y, int w, int h, int ox, int oy) {
         return ox >= x && ox <= x + w && oy >= y && oy <= y + h;
+    }
+
+    private boolean slotEnabled(int x, int y) {
+        switch (selectedTable) {
+            case BASIC:
+                return x > 2 && x <= 5 && y > 2 && y <= 5;
+            case ADVANCED:
+                return x > 1 && x <= 6 && y > 1 && y <= 6;
+            case ELITE:
+                return x > 0 && x <= 7 && y > 0 && y <= 7;
+            case ULTIMATE:
+                return true;
+        }
+        return false;
     }
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         super.actionPerformed(button);
 
-        if(button == oredictPattern) {
+        if (button == oredictPattern) {
             tile.setOredictPattern(oredictPattern.isChecked());
             RefinedAvaritia.instance.network.sendToServer(new MessageSetOredictExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), oredictPattern.isChecked()));
         }
@@ -96,14 +137,40 @@ public class GuiExtremePatternEncoder extends GuiContainer{
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        if(isOverClear(mouseX - guiLeft, mouseY - guiTop)) {
+        if (isOverClear(mouseX - guiLeft, mouseY - guiTop)) {
             RefinedAvaritia.instance.network.sendToServer(new MessageClearExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ()));
 
             mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
-        } else if(isOverCreatePattern(mouseX - guiLeft, mouseY - guiTop)) {
+        } else if (isOverCreatePattern(mouseX - guiLeft, mouseY - guiTop)) {
             RefinedAvaritia.instance.network.sendToServer(new MessageCreateExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ()));
 
             mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+        } else if(Loader.isModLoaded("extendedcrafting")) {
+            if (isOverBasic(mouseX - guiLeft, mouseY - guiTop)) {
+                RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.BASIC));
+                selectedTable = TableSize.BASIC;
+                tile.setTableSize(selectedTable);
+
+                mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            } else if (isOverAdvanced(mouseX - guiLeft, mouseY - guiTop)) {
+                RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.ADVANCED));
+                selectedTable = TableSize.ADVANCED;
+                tile.setTableSize(selectedTable);
+
+                mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            } else if (isOverElite(mouseX - guiLeft, mouseY - guiTop)) {
+                RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.ELITE));
+                selectedTable = TableSize.ELITE;
+                tile.setTableSize(selectedTable);
+
+                mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            } else if (isOverUltimate(mouseX - guiLeft, mouseY - guiTop)) {
+                RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.ULTIMATE));
+                selectedTable = TableSize.ULTIMATE;
+                tile.setTableSize(selectedTable);
+
+                mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
+            }
         }
     }
 
@@ -111,20 +178,54 @@ public class GuiExtremePatternEncoder extends GuiContainer{
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
-        bindTexture(RefinedAvaritia.MODID, "gui/extreme_pattern_encoder.png");
+        bindTexture(RefinedAvaritia.MODID, GUI_TEXTURE);
 
         drawTexture(guiLeft, guiTop, 0, 0, screenWidth, screenHeight);
+
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 9; y++) {
+                if(!slotEnabled(x, y)) {
+                    drawTexture(guiLeft + 11 + (x * 18), guiTop + 7 + (y * 18), 238, 49, 18, 18);
+                }
+            }
+        }
 
 
         int ty = 0;
 
-        if(isOverCreatePattern(mouseX-guiLeft, mouseY-guiTop))
+        if (isOverCreatePattern(mouseX - guiLeft, mouseY - guiTop))
             ty = 1;
 
-        if(tile != null && !tile.canCreatePattern())
+        if (tile != null && !tile.canCreatePattern())
             ty = 2;
 
         drawTexture(guiLeft + 199, guiTop + 57, 240, ty * 16, 16, 16);
+
+        if (Loader.isModLoaded("extendedcrafting")) {
+            //Basic
+            bindTexture(RefinedAvaritia.MODID, GUI_BUTTON);
+            drawTexture(guiLeft - 14, guiTop + 173, selectedTable == TableSize.BASIC ? 0 : 50, 0, 50, 32);
+            fontRenderer.drawString("3x3", guiLeft - 14 + 16, guiTop + 173 + 12, fontRenderer.getColorCode('0'));
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+            //Advanced
+            bindTexture(RefinedAvaritia.MODID, GUI_BUTTON);
+            drawTexture(guiLeft + 202, guiTop + 173, selectedTable == TableSize.ADVANCED ? 0 : 50, 0, 50, 32);
+            fontRenderer.drawString("5x5", guiLeft + 202 + 16, guiTop + 173 + 12, fontRenderer.getColorCode('0'));
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+            //Elite
+            bindTexture(RefinedAvaritia.MODID, GUI_BUTTON);
+            drawTexture(guiLeft - 14, guiTop + 210, selectedTable == TableSize.ELITE ? 0 : 50, 0, 50, 32);
+            fontRenderer.drawString("7x7", guiLeft - 14 + 16, guiTop + 210 + 12, fontRenderer.getColorCode('0'));
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+            //Ultimate
+            bindTexture(RefinedAvaritia.MODID, GUI_BUTTON);
+            drawTexture(guiLeft + 202, guiTop + 210, selectedTable == TableSize.ULTIMATE ? 0 : 50, 0, 50, 32);
+            fontRenderer.drawString("9x9", guiLeft + 202 + 16, guiTop + 210 + 12, fontRenderer.getColorCode('0'));
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }
     }
 
     @Override
@@ -134,11 +235,11 @@ public class GuiExtremePatternEncoder extends GuiContainer{
         mouseX -= guiLeft;
         mouseY -= guiTop;
 
-        if(isOverClear(mouseX, mouseY)) {
+        if (isOverClear(mouseX, mouseY)) {
             drawTooltip(mouseX, mouseY, I18n.format("misc.refined_avaritia:clear_tooltip"));
         }
 
-        if(isOverCreatePattern(mouseX, mouseY)) {
+        if (isOverCreatePattern(mouseX, mouseY)) {
             drawTooltip(mouseX, mouseY, I18n.format("misc.refined_avaritia:create_pattern_tooltip"));
         }
     }

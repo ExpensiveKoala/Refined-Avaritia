@@ -31,15 +31,18 @@ public class MessageTransferAvaritiaRecipe extends Message<MessageTransferAvarit
 
     @Override
     public void handle(MessageTransferAvaritiaRecipe message, EntityPlayerMP player) {
-        TileEntity tile = player.getEntityWorld().getTileEntity(new BlockPos(message.x, message.y, message.z));
+        BlockPos pos = new BlockPos(message.x, message.y, message.z);
+        if(player.getEntityWorld().isBlockLoaded(pos)) {
+            TileEntity tile = player.getEntityWorld().getTileEntity(pos);
 
-        if(tile instanceof TileExtremePatternEncoder) {
-            TileExtremePatternEncoder encoder = (TileExtremePatternEncoder)tile;
-            ItemHandlerRestricted recipe = (ItemHandlerRestricted)encoder.getRecipe();
-            for (int i = 0; i < recipe.getSlots(); i++) {
-                recipe.setStackInSlot(i, message.items.get(i));
+            if (tile instanceof TileExtremePatternEncoder) {
+                TileExtremePatternEncoder encoder = (TileExtremePatternEncoder) tile;
+                ItemHandlerRestricted recipe = (ItemHandlerRestricted) encoder.getRecipe();
+                for (int i = 0; i < recipe.getSlots(); i++) {
+                    recipe.setStackInSlot(i, message.items.get(i));
+                }
+                ((TileExtremePatternEncoder) tile).onContentsChanged();
             }
-            ((TileExtremePatternEncoder) tile).onContentsChanged();
         }
     }
 

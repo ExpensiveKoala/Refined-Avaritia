@@ -3,14 +3,12 @@ package com.expensivekoala.refined_avaritia.proxy;
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
-import com.expensivekoala.refined_avaritia.network.MessageClearExtremePattern;
-import com.expensivekoala.refined_avaritia.network.MessageCreateExtremePattern;
-import com.expensivekoala.refined_avaritia.network.MessageSetOredictExtremePattern;
-import com.expensivekoala.refined_avaritia.network.MessageTransferAvaritiaRecipe;
+import com.expensivekoala.refined_avaritia.network.*;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
 import com.expensivekoala.refined_avaritia.util.PatternEventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
@@ -30,6 +28,7 @@ public class CommonProxy {
         RefinedAvaritia.instance.network.registerMessage(MessageClearExtremePattern.class, MessageClearExtremePattern.class, 1, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageSetOredictExtremePattern.class, MessageSetOredictExtremePattern.class, 2, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageTransferAvaritiaRecipe.class, MessageTransferAvaritiaRecipe.class, 3, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageSetTableSize.class, MessageSetTableSize.class, 4, Side.SERVER);
     }
 
     public void init(FMLInitializationEvent e)
@@ -49,7 +48,7 @@ public class CommonProxy {
         if(Loader.isModLoaded("avaritia")) {
             event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER);
 
-            GameRegistry.registerTileEntity(TileExtremePatternEncoder.class, RefinedAvaritia.MODID + ":extreme_pattern_encoder");
+            GameRegistry.registerTileEntity(TileExtremePatternEncoder.class, new ResourceLocation(RefinedAvaritia.MODID,"extreme_pattern_encoder"));
         }
     }
 

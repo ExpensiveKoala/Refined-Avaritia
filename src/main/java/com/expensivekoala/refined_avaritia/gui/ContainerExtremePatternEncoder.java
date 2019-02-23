@@ -2,6 +2,8 @@ package com.expensivekoala.refined_avaritia.gui;
 
 import com.expensivekoala.refined_avaritia.gui.slots.SlotPhantom;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
+import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil;
+import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil.TableSize;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
@@ -34,7 +36,7 @@ public class ContainerExtremePatternEncoder extends Container {
 
             x += 18;
 
-            if((i + 1) % 9 == 0) {
+            if ((i + 1) % 9 == 0) {
                 y += 18;
                 x = 12;
             }
@@ -42,7 +44,7 @@ public class ContainerExtremePatternEncoder extends Container {
 
         //210, 121 addSlotToContainer()
         addSlotToContainer(new SlotPhantom(tile.getRecipeOutput(), 0, 210, 121, true, tile));
-        addPlayerInventory(39,174);
+        addPlayerInventory(39, 174);
         tile.onContentsChanged();
     }
 
@@ -67,20 +69,20 @@ public class ContainerExtremePatternEncoder extends Container {
         ItemStack stack = null;
         Slot slot = getSlot(slotIndex);
 
-        if(slot instanceof SlotPhantom && ((SlotPhantom)slot).isOutput()) {
+        if (slot instanceof SlotPhantom && ((SlotPhantom) slot).isOutput()) {
             return ItemStack.EMPTY;
         }
 
-        if(slot != null && !(slot instanceof SlotPhantom) && slot.getHasStack()) {
+        if (!(slot instanceof SlotPhantom) && slot.getHasStack()) {
             stack = slot.getStack();
 
-            if(slotIndex < 2) {
-                if(!mergeItemStack(stack, 2 + 18, inventorySlots.size(), false))
+            if (slotIndex < 2) {
+                if (!mergeItemStack(stack, 2 + 18, inventorySlots.size(), false))
                     return ItemStack.EMPTY;
-            } else if(!mergeItemStack(stack, 0, 1, false))
+            } else if (!mergeItemStack(stack, 0, 1, false))
                 return ItemStack.EMPTY;
 
-            if(stack.getCount() == 0)
+            if (stack.getCount() == 0)
                 slot.putStack(ItemStack.EMPTY);
             else
                 slot.onSlotChanged();
@@ -93,13 +95,13 @@ public class ContainerExtremePatternEncoder extends Container {
     public ItemStack slotClick(int id, int dragType, ClickType clickType, EntityPlayer player) {
         Slot slot = id >= 0 ? getSlot(id) : null;
 
-        if(slot instanceof SlotPhantom) {
-            if(((SlotPhantom) slot).isOutput())
+        if (slot instanceof SlotPhantom) {
+            if (((SlotPhantom) slot).isOutput())
                 return ItemStack.EMPTY;
 
-            if(!player.inventory.getItemStack().isEmpty() && slot.isItemValid(player.inventory.getItemStack())) {
+            if (!player.inventory.getItemStack().isEmpty() && slot.isItemValid(player.inventory.getItemStack())) {
                 slot.putStack(player.inventory.getItemStack().copy());
-            } else if(player.inventory.getItemStack().isEmpty()) {
+            } else if (player.inventory.getItemStack().isEmpty()) {
                 slot.putStack(ItemStack.EMPTY);
             }
             return player.inventory.getItemStack();

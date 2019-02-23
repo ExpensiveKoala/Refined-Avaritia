@@ -28,10 +28,13 @@ public class MessageSetOredictExtremePattern extends Message<MessageSetOredictEx
 
     @Override
     public void handle(MessageSetOredictExtremePattern message, EntityPlayerMP player) {
-        TileEntity tile = player.getEntityWorld().getTileEntity(new BlockPos(message.x, message.y, message.z));
+        BlockPos pos = new BlockPos(message.x, message.y, message.z);
+        if(player.getEntityWorld().isBlockLoaded(pos)) {
+            TileEntity tile = player.getEntityWorld().getTileEntity(pos);
 
-        if(tile instanceof TileExtremePatternEncoder) {
-            ((TileExtremePatternEncoder) tile).setOredictPattern(message.value);
+            if (tile instanceof TileExtremePatternEncoder) {
+                ((TileExtremePatternEncoder) tile).setOredictPattern(message.value);
+            }
         }
     }
 

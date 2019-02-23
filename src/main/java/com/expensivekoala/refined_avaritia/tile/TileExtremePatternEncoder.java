@@ -4,6 +4,8 @@ import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.inventory.ItemHandlerRestricted;
 import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
+import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil;
+import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil.TableSize;
 import com.expensivekoala.refined_avaritia.util.RecipeManager;
 import com.expensivekoala.refined_avaritia.util.RecipeType;
 import com.expensivekoala.refined_avaritia.util.StackUtils;
@@ -12,6 +14,8 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -19,17 +23,49 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class TileExtremePatternEncoder extends TileEntity {
     private static final String NBT_OREDICT_PATTERN = "OredictPattern";
+    private static final String NBT_TABLE_SIZE = "TableSize";
 
     private ItemHandlerRestricted patterns = new ItemHandlerRestricted(2, new ResourceLocation(RefinedAvaritia.MODID, "extreme_pattern"));
     private ItemHandlerRestricted recipe = new ItemHandlerRestricted(9 * 9);
     private ItemHandlerRestricted recipeOutput = new ItemHandlerRestricted(1);
 
     private boolean oredictPattern;
+    private TableSize tableSize;
 
     public TileExtremePatternEncoder() {
         oredictPattern = false;
+        tableSize = TableSize.ULTIMATE;
+    }
+
+    @Nullable
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        handleUpdateTag(pkt.getNbtCompound());
+    }
+
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag) {
+        super.handleUpdateTag(tag);
+        oredictPattern = tag.getBoolean(NBT_OREDICT_PATTERN);
+        tableSize = TableSize.values()[tag.getInteger(NBT_TABLE_SIZE)];
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        NBTTagCompound tag = super.getUpdateTag();
+        tag.setBoolean(NBT_OREDICT_PATTERN, oredictPattern);
+        tag.setInteger(NBT_TABLE_SIZE, tableSize.ordinal());
+        return tag;
     }
 
     @Override
@@ -40,6 +76,7 @@ public class TileExtremePatternEncoder extends TileEntity {
         StackUtils.writeItems(recipe, 1, tag);
 
         tag.setBoolean(NBT_OREDICT_PATTERN, oredictPattern);
+        tag.setInteger(NBT_TABLE_SIZE, tableSize.ordinal());
 
         return tag;
     }
@@ -50,11 +87,12 @@ public class TileExtremePatternEncoder extends TileEntity {
         StackUtils.readItems(patterns, 0, tag);
         StackUtils.readItems(recipe, 1, tag);
         oredictPattern = tag.getBoolean(NBT_OREDICT_PATTERN);
+        tableSize = TableSize.values()[tag.getInteger(NBT_TABLE_SIZE)];
     }
 
     public void onCreatePattern() {
-        if(canCreatePattern()) {
-            patterns.extractItem(0,1,false);
+        if (canCreatePattern()) {
+            patterns.extractItem(0, 1, false);
 
             ItemStack pattern = new ItemStack(Registry.PATTERN);
 
@@ -65,7 +103,7 @@ public class TileExtremePatternEncoder extends TileEntity {
             for (int i = 0; i < 81; i++) {
                 ItemStack ingredient = recipe.getStackInSlot(i);
 
-                if(!ingredient.isEmpty()) {
+                if (!ingredient.isEmpty()) {
                     ItemExtremePattern.setSlot(pattern, i, ingredient);
                 }
             }
@@ -99,6 +137,41 @@ public class TileExtremePatternEncoder extends TileEntity {
         this.oredictPattern = oredictPattern;
     }
 
+    public TableSize getTableSize() {
+        return tableSize;
+    }
+
+    public void setTableSize(TableSize tableSize) {
+        this.tableSize = tableSize;
+        for (int i = 0; i < recipe.getSlots(); i++) {
+            if (recipe.getStackInSlot(i) != ItemStack.EMPTY) {
+                int x = i % 9;
+                int y = i / 9;
+                switch (this.tableSize) {
+                    case BASIC:
+                        if (x >= 2 && x <= 6 && (y == 2 || y == 6)) {
+                            recipe.setStackInSlot(i, ItemStack.EMPTY);
+                        } else if (y > 2 && y < 6 && (x == 2 || x == 6)) {
+                            recipe.setStackInSlot(i, ItemStack.EMPTY);
+                        }
+                    case ADVANCED:
+                        if (x >= 1 && x <= 7 && (y == 1 || y == 7)) {
+                            recipe.setStackInSlot(i, ItemStack.EMPTY);
+                        } else if (y > 1 && y < 7 && (x == 1 || x == 7)) {
+                            recipe.setStackInSlot(i, ItemStack.EMPTY);
+                        }
+                    case ELITE:
+                        if (x >= 0 && x <= 8 && (y == 0 || y == 8)) {
+                            recipe.setStackInSlot(i, ItemStack.EMPTY);
+                        } else if (y > 0 && y < 8 && (x == 0 || x == 8)) {
+                            recipe.setStackInSlot(i, ItemStack.EMPTY);
+                        }
+                }
+            }
+        }
+        onContentsChanged();
+    }
+
     public static InventoryCrafting getCrafting(IItemHandler recipe) {
         Container craftingContainer = new Container() {
             @Override
@@ -109,7 +182,7 @@ public class TileExtremePatternEncoder extends TileEntity {
         InventoryCrafting crafting = new InventoryCrafting(craftingContainer, 9, 9);
 
         for (int i = 0; i < recipe.getSlots(); i++) {
-            if(recipe.getStackInSlot(i) != ItemStack.EMPTY)
+            if (recipe.getStackInSlot(i) != ItemStack.EMPTY)
                 crafting.setInventorySlotContents(i, recipe.getStackInSlot(i));
         }
 
@@ -124,7 +197,9 @@ public class TileExtremePatternEncoder extends TileEntity {
         return recipe;
     }
 
-    public IItemHandler getRecipeOutput() { return recipeOutput; }
+    public IItemHandler getRecipeOutput() {
+        return recipeOutput;
+    }
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
@@ -133,7 +208,7 @@ public class TileExtremePatternEncoder extends TileEntity {
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return (T) patterns;
         }
         return super.getCapability(capability, facing);

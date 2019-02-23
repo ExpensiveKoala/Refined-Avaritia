@@ -13,6 +13,13 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
  */
 public class ExtendedCraftingUtil {
 
+    public enum TableSize {
+        BASIC,
+        ADVANCED,
+        ELITE,
+        ULTIMATE
+    }
+
     public static void handlePatternRightClick(PlayerInteractEvent.RightClickBlock event) {
         if (event.getEntityPlayer().getHeldItem(event.getHand()).getItem() == Registry.PATTERN
           && !event.getEntityPlayer().getHeldItem(event.getHand()).hasTagCompound()) {

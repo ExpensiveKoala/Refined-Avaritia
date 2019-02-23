@@ -111,7 +111,6 @@ public class ExtremePattern implements ICraftingPattern {
                         }
                     }
                 }
-                System.out.println(valid + " : " + output);
             }
         }
     }
