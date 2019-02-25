@@ -5,6 +5,6 @@ block.refined_avaritia:extreme_pattern_encoder.name=Extreme Pattern Encoder
 block.refined_avaritia:extreme_pattern_encoder.tooltip=Use only for Avaritia crafting recipes.
 
 misc.refined_avaritia:oredict=Oredict
+misc.refined_avaritia:avaritia=Avaritia
 misc.refined_avaritia:clear_tooltip=Clear
 misc.refined_avaritia:create_pattern_tooltip=Create
-misc.refined_avaritia:extended_pattern=Right click on an Extended Crafting Table to set the recipe.

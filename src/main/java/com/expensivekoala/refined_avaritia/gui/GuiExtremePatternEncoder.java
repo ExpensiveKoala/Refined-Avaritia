@@ -2,10 +2,7 @@ package com.expensivekoala.refined_avaritia.gui;
 
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.gui.slots.SlotPhantom;
-import com.expensivekoala.refined_avaritia.network.MessageClearExtremePattern;
-import com.expensivekoala.refined_avaritia.network.MessageCreateExtremePattern;
-import com.expensivekoala.refined_avaritia.network.MessageSetOredictExtremePattern;
-import com.expensivekoala.refined_avaritia.network.MessageSetTableSize;
+import com.expensivekoala.refined_avaritia.network.*;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
 import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil;
 import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil.TableSize;
@@ -40,6 +37,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
     TableSize selectedTable = TableSize.ULTIMATE;
     TileExtremePatternEncoder tile;
     GuiCheckBox oredictPattern;
+    GuiCheckBox avaritia;
 
     public GuiExtremePatternEncoder(ContainerExtremePatternEncoder container, TileExtremePatternEncoder tile) {
         super(container);
@@ -57,6 +55,14 @@ public class GuiExtremePatternEncoder extends GuiContainer {
         lastButtonId = 0;
 
         oredictPattern = addCheckBox(guiLeft + 175, guiTop + 156, I18n.format("misc.refined_avaritia:oredict"), tile.getOredictPattern());
+        if (Loader.isModLoaded("avaritia")) {
+            avaritia = addCheckBox(guiLeft + 175, guiTop + 144, I18n.format("misc.refined_avaritia:avaritia"), tile.isAvaritia());
+            if (avaritia.isChecked()) {
+                RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.ULTIMATE));
+                selectedTable = TableSize.ULTIMATE;
+                tile.setTableSize(selectedTable);
+            }
+        }
         this.selectedTable = tile.getTableSize();
     }
 
@@ -132,6 +138,16 @@ public class GuiExtremePatternEncoder extends GuiContainer {
             tile.setOredictPattern(oredictPattern.isChecked());
             RefinedAvaritia.instance.network.sendToServer(new MessageSetOredictExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), oredictPattern.isChecked()));
         }
+
+        if (Loader.isModLoaded("avaritia") && button == avaritia) {
+            tile.setAvaritia(avaritia.isChecked());
+            RefinedAvaritia.instance.network.sendToServer(new MessageSetAvaritiaPattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), avaritia.isChecked()));
+            if (avaritia.isChecked()) {
+                RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.ULTIMATE));
+                selectedTable = TableSize.ULTIMATE;
+                tile.setTableSize(selectedTable);
+            }
+        }
     }
 
     @Override
@@ -145,7 +161,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
             RefinedAvaritia.instance.network.sendToServer(new MessageCreateExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ()));
 
             mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
-        } else if(Loader.isModLoaded("extendedcrafting")) {
+        } else if (Loader.isModLoaded("extendedcrafting") && !avaritia.isChecked()) {
             if (isOverBasic(mouseX - guiLeft, mouseY - guiTop)) {
                 RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.BASIC));
                 selectedTable = TableSize.BASIC;
@@ -171,6 +187,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
 
                 mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
             }
+            tile.onContentsChanged();
         }
     }
 
@@ -184,7 +201,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
 
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 9; y++) {
-                if(!slotEnabled(x, y)) {
+                if (!slotEnabled(x, y)) {
                     drawTexture(guiLeft + 11 + (x * 18), guiTop + 7 + (y * 18), 238, 49, 18, 18);
                 }
             }
@@ -201,7 +218,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
 
         drawTexture(guiLeft + 199, guiTop + 57, 240, ty * 16, 16, 16);
 
-        if (Loader.isModLoaded("extendedcrafting")) {
+        if (Loader.isModLoaded("extendedcrafting") && !avaritia.isChecked()) {
             //Basic
             bindTexture(RefinedAvaritia.MODID, GUI_BUTTON);
             drawTexture(guiLeft - 14, guiTop + 173, selectedTable == TableSize.BASIC ? 0 : 50, 0, 50, 32);

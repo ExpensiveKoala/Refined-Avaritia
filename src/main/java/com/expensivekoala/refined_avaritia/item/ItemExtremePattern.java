@@ -62,13 +62,6 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        if (!stack.hasTagCompound()) {
-            if (Loader.isModLoaded("extendedcrafting")) {
-                tooltip.add(TextFormatting.GREEN + I18n.format("misc.refined_avaritia:extended_pattern") + TextFormatting.RESET);
-            }
-            return;
-        }
-
         ICraftingPattern pattern = getPatternFromCache(worldIn, stack);
 
         if (pattern.isValid()) {

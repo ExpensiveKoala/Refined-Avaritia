@@ -5,7 +5,6 @@ import com.expensivekoala.refined_avaritia.Registry;
 import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
 import com.expensivekoala.refined_avaritia.network.*;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
-import com.expensivekoala.refined_avaritia.util.PatternEventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -24,17 +23,18 @@ import net.minecraftforge.fml.relauncher.Side;
 public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e)
     {
-        RefinedAvaritia.instance.network.registerMessage(MessageCreateExtremePattern.class, MessageCreateExtremePattern.class, 0, Side.SERVER);
-        RefinedAvaritia.instance.network.registerMessage(MessageClearExtremePattern.class, MessageClearExtremePattern.class, 1, Side.SERVER);
-        RefinedAvaritia.instance.network.registerMessage(MessageSetOredictExtremePattern.class, MessageSetOredictExtremePattern.class, 2, Side.SERVER);
-        RefinedAvaritia.instance.network.registerMessage(MessageTransferAvaritiaRecipe.class, MessageTransferAvaritiaRecipe.class, 3, Side.SERVER);
-        RefinedAvaritia.instance.network.registerMessage(MessageSetTableSize.class, MessageSetTableSize.class, 4, Side.SERVER);
+        int id = 0;
+        RefinedAvaritia.instance.network.registerMessage(MessageCreateExtremePattern.class, MessageCreateExtremePattern.class, id++, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageClearExtremePattern.class, MessageClearExtremePattern.class, id++, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageSetOredictExtremePattern.class, MessageSetOredictExtremePattern.class, id++, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageSetAvaritiaPattern.class, MessageSetAvaritiaPattern.class, id++, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageTransferAvaritiaRecipe.class, MessageTransferAvaritiaRecipe.class, id++, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageSetTableSize.class, MessageSetTableSize.class, id++, Side.SERVER);
     }
 
     public void init(FMLInitializationEvent e)
     {
         NetworkRegistry.INSTANCE.registerGuiHandler(RefinedAvaritia.instance, new GuiHandler());
-        MinecraftForge.EVENT_BUS.register(new PatternEventHandler());
     }
 
     public void postInit(FMLPostInitializationEvent e)

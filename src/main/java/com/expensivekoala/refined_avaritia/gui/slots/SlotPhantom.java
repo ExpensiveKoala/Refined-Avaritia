@@ -9,9 +9,10 @@ import net.minecraftforge.items.SlotItemHandler;
 /**
  * @author ExpensiveKoala
  */
-public class SlotPhantom extends SlotItemHandler{
+public class SlotPhantom extends SlotItemHandler {
     boolean output;
     TileExtremePatternEncoder tile;
+
     public SlotPhantom(IItemHandler itemHandler, int index, int xPosition, int yPosition, boolean output, TileExtremePatternEncoder tile) {
         super(itemHandler, index, xPosition, yPosition);
         this.output = output;
@@ -30,13 +31,13 @@ public class SlotPhantom extends SlotItemHandler{
 
     @Override
     public void putStack(ItemStack stack) {
-        if(!output && !stack.isEmpty()) stack.setCount(1);
+        if (!output && !stack.isEmpty()) stack.setCount(1);
         super.putStack(stack);
     }
 
     @Override
     public void onSlotChanged() {
-        if(!output) {
+        if (!output) {
             tile.onContentsChanged();
         }
     }
@@ -47,6 +48,7 @@ public class SlotPhantom extends SlotItemHandler{
 
     @Override
     public boolean isEnabled() {
+        if (output) return true;
         int x = getSlotIndex() % 9;
         int y = getSlotIndex() / 9;
         switch (tile.getTableSize()) {
