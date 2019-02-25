@@ -19,10 +19,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+
 @Mod.EventBusSubscriber
 public class CommonProxy {
-    public void preInit(FMLPreInitializationEvent e)
-    {
+    public void preInit(FMLPreInitializationEvent e) {
         int id = 0;
         RefinedAvaritia.instance.network.registerMessage(MessageCreateExtremePattern.class, MessageCreateExtremePattern.class, id++, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageClearExtremePattern.class, MessageClearExtremePattern.class, id++, Side.SERVER);
@@ -32,33 +32,27 @@ public class CommonProxy {
         RefinedAvaritia.instance.network.registerMessage(MessageSetTableSize.class, MessageSetTableSize.class, id++, Side.SERVER);
     }
 
-    public void init(FMLInitializationEvent e)
-    {
+    public void init(FMLInitializationEvent e) {
         NetworkRegistry.INSTANCE.registerGuiHandler(RefinedAvaritia.instance, new GuiHandler());
     }
 
-    public void postInit(FMLPostInitializationEvent e)
-    {
+    public void postInit(FMLPostInitializationEvent e) {
 
     }
 
     @SubscribeEvent
-    public static void registerBlocks(RegistryEvent.Register<Block> event)
-    {
-        if(Loader.isModLoaded("avaritia")) {
-            event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER);
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER);
 
-            GameRegistry.registerTileEntity(TileExtremePatternEncoder.class, new ResourceLocation(RefinedAvaritia.MODID,"extreme_pattern_encoder"));
-        }
+        GameRegistry.registerTileEntity(TileExtremePatternEncoder.class, new ResourceLocation(RefinedAvaritia.MODID, "extreme_pattern_encoder"));
+
     }
 
     @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> event)
-    {
+    public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(Registry.PATTERN);
-        if(Loader.isModLoaded("avaritia")) {
-            event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER.createItem());
-        }
+        event.getRegistry().register(Registry.EXTREME_PATTERN_ENCODER.createItem());
+
     }
 }
 
