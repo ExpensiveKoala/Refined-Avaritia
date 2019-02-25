@@ -1,0 +1,9 @@
+itemGroup.refined_avaritia=Refined Avaritia
+item.refined_avaritia:extreme_pattern.name=Экстремальный Шаблон
+
+block.refined_avaritia:extreme_pattern_encoder.name=Экстремальный кодировщик шаблонов
+block.refined_avaritia:extreme_pattern_encoder.tooltip=Используется только для рецептов Avaritia.
+
+misc.refined_avaritia:oredict=Словарь руд
+misc.refined_avaritia:clear_tooltip=Очистить
+misc.refined_avaritia:create_pattern_tooltip=Создать
