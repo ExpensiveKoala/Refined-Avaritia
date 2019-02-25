@@ -4,6 +4,7 @@ import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.gui.slots.SlotPhantom;
 import com.expensivekoala.refined_avaritia.network.*;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
+import com.expensivekoala.refined_avaritia.util.ECRecipeManagerWrapper;
 import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil;
 import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil.TableSize;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -14,6 +15,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -55,7 +57,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
         lastButtonId = 0;
 
         oredictPattern = addCheckBox(guiLeft + 175, guiTop + 156, I18n.format("misc.refined_avaritia:oredict"), tile.getOredictPattern());
-        if (Loader.isModLoaded("avaritia")) {
+        if (Loader.isModLoaded("avaritia") && Loader.isModLoaded("extendedcrafting")) {
             avaritia = addCheckBox(guiLeft + 175, guiTop + 144, I18n.format("misc.refined_avaritia:avaritia"), tile.isAvaritia());
             if (avaritia.isChecked()) {
                 RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.ULTIMATE));
@@ -139,7 +141,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
             RefinedAvaritia.instance.network.sendToServer(new MessageSetOredictExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), oredictPattern.isChecked()));
         }
 
-        if (Loader.isModLoaded("avaritia") && button == avaritia) {
+        if (Loader.isModLoaded("avaritia") && Loader.isModLoaded("extendedcrafting") && button == avaritia) {
             tile.setAvaritia(avaritia.isChecked());
             RefinedAvaritia.instance.network.sendToServer(new MessageSetAvaritiaPattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), avaritia.isChecked()));
             if (avaritia.isChecked()) {
@@ -161,7 +163,10 @@ public class GuiExtremePatternEncoder extends GuiContainer {
             RefinedAvaritia.instance.network.sendToServer(new MessageCreateExtremePattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ()));
 
             mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
-        } else if (Loader.isModLoaded("extendedcrafting") && !avaritia.isChecked()) {
+        } else if (Loader.isModLoaded("extendedcrafting")) {
+            if (avaritia != null && avaritia.isChecked()) {
+                return;
+            }
             if (isOverBasic(mouseX - guiLeft, mouseY - guiTop)) {
                 RefinedAvaritia.instance.network.sendToServer(new MessageSetTableSize(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), TableSize.BASIC));
                 selectedTable = TableSize.BASIC;
@@ -187,7 +192,6 @@ public class GuiExtremePatternEncoder extends GuiContainer {
 
                 mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
             }
-            tile.onContentsChanged();
         }
     }
 
@@ -218,7 +222,10 @@ public class GuiExtremePatternEncoder extends GuiContainer {
 
         drawTexture(guiLeft + 199, guiTop + 57, 240, ty * 16, 16, 16);
 
-        if (Loader.isModLoaded("extendedcrafting") && !avaritia.isChecked()) {
+        if (Loader.isModLoaded("extendedcrafting")) {
+            if(avaritia != null && avaritia.isChecked()) {
+                return;
+            }
             //Basic
             bindTexture(RefinedAvaritia.MODID, GUI_BUTTON);
             drawTexture(guiLeft - 14, guiTop + 173, selectedTable == TableSize.BASIC ? 0 : 50, 0, 50, 32);

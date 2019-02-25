@@ -62,6 +62,9 @@ public class ItemExtremePattern extends Item implements ICraftingPatternProvider
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        if(!stack.hasTagCompound()) {
+            return;
+        }
         ICraftingPattern pattern = getPatternFromCache(worldIn, stack);
 
         if (pattern.isValid()) {

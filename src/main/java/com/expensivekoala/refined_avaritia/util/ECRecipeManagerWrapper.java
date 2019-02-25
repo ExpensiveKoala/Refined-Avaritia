@@ -7,8 +7,11 @@ import com.blakebr0.extendedcrafting.compat.jei.tablecrafting.UltimateTableCateg
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
+
+import java.util.Collection;
 
 public class ECRecipeManagerWrapper {
     public static final String[] EXTREME_CRAFTING = new String[] {BasicTableCategory.UID, AdvancedTableCategory.UID, EliteTableCategory.UID, UltimateTableCategory.UID};
@@ -21,5 +24,8 @@ public class ECRecipeManagerWrapper {
             }
         }
         return result;
+    }
+    public static Collection<IRecipe> getRecipes() {
+        return TableRecipeManager.getInstance().getRecipes();
     }
 }

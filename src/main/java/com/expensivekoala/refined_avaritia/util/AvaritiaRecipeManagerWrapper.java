@@ -2,6 +2,7 @@ package com.expensivekoala.refined_avaritia.util;
 
 import morph.avaritia.compat.jei.AvaritiaJEIPlugin;
 import morph.avaritia.recipe.AvaritiaRecipeManager;
+import morph.avaritia.recipe.extreme.IExtremeRecipe;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -18,5 +19,8 @@ public class AvaritiaRecipeManagerWrapper {
             result = AvaritiaRecipeManager.getExtremeCraftingResult(crafting, world);
         }
         return result;
+    }
+    public static Collection<IExtremeRecipe> getRecipes() {
+        return AvaritiaRecipeManager.EXTREME_RECIPES.values();
     }
 }

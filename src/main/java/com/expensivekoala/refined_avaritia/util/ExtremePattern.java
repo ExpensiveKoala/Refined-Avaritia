@@ -46,7 +46,7 @@ public class ExtremePattern implements ICraftingPattern {
             this.recipeType = RecipeType.AVARITIA;
         }
         this.stack = stack;
-        this.processing = false;
+        this.processing = ItemPattern.isProcessing(stack);
         this.oredict = ItemExtremePattern.isOredict(stack);
 
         InventoryCrafting inv = new InventoryCrafting(new Container() {
@@ -59,23 +59,24 @@ public class ExtremePattern implements ICraftingPattern {
         for (int i = 0; i < (recipeType.width * recipeType.height); ++i) {
             ItemStack slot = ItemExtremePattern.getSlot(stack, i);
 
-            inputs.add(slot == null ? NonNullList.create() : NonNullList.from(ItemStack.EMPTY, slot));
+            inputs.add(slot.isEmpty() ? NonNullList.create() : NonNullList.from(ItemStack.EMPTY, slot));
 
-            if (slot != null) {
+            if (!slot.isEmpty()) {
                 inv.setInventorySlotContents(i, slot);
             }
         }
 
-        if (!ItemPattern.isProcessing(stack)) {
+        if (!processing) {
             if (recipeType == RecipeType.AVARITIA) {
-                for (IExtremeRecipe r : AvaritiaRecipeManager.EXTREME_RECIPES.values()) {
+                for (IExtremeRecipe r : AvaritiaRecipeManagerWrapper.getRecipes()) {
                     if (r.matches(inv, world)) {
                         avaritiaRecipe = r;
                         break;
                     }
                 }
             } else {
-                for (Object o : TableRecipeManager.getInstance().getRecipes()) {
+                //It's not finding the Extended crafting recipe
+                for (Object o : ECRecipeManagerWrapper.getRecipes()) {
                     IRecipe r = (IRecipe) o;
                     if (r.matches(inv, world)) {
                         extendedRecipe = r;

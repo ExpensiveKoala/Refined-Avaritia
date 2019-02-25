@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 public class RefinedAvaritia {
     public static final String MODID = "refined_avaritia";
     public static final String MODNAME = "Refined Avaritia";
-    public static final String VERSION = "2.4";
+    public static final String VERSION = "2.5";
     public static final String DEPENDENCIES = "required-after:refinedstorage@[1.6.1,);after:avaritia@[3.2,);" +
             "after:extendedcrafting@[1.5,)";
 

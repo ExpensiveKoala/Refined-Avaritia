@@ -134,7 +134,7 @@ public class TileExtremePatternEncoder extends TileEntity {
                 for (int i = 0; i < type.width * type.height; i++) {
                     int x = i % type.width;
                     int y = i / type.height;
-                    ItemStack ingredient = recipe.getStackInSlot((x + ((9 - type.width) / 2)) * 9 + (y + ((9 - type.height) / 2)));
+                    ItemStack ingredient = recipe.getStackInSlot((y + ((9 - type.height) / 2)) * 9 + (x + ((9 - type.width) / 2)));
 
                     if (!ingredient.isEmpty()) {
                         ItemExtremePattern.setSlot(pattern, i, ingredient);
@@ -256,8 +256,8 @@ public class TileExtremePatternEncoder extends TileEntity {
             InventoryCrafting crafting = new InventoryCrafting(craftingContainer, type.width, type.height);
             for (int x = 0; x < type.width; x++) {
                 for (int y = 0; y < type.height; y++) {
-                    if (!recipe.getStackInSlot((x + ((9 - type.width) / 2)) * 9 + (y + ((9 - type.height) / 2))).isEmpty()) {
-                        crafting.setInventorySlotContents(x * type.width + y, recipe.getStackInSlot((x + ((9 - type.width) / 2)) * 9 + (y + ((9 - type.height) / 2))));
+                    if (!recipe.getStackInSlot((y + ((9 - type.height) / 2)) * 9 + (x + ((9 - type.width) / 2))).isEmpty()) {
+                        crafting.setInventorySlotContents(y * type.height + x, recipe.getStackInSlot((y + ((9 - type.height) / 2)) * 9 + (x + ((9 - type.width) / 2))));
                     }
                 }
             }

@@ -57,7 +57,7 @@ public class AvaritiaEncoderRecipeTransferHandler implements IRecipeTransferHand
             container.getTile().setAvaritia(true);
             if(player.world.isRemote) {
                 Gui gui = Minecraft.getMinecraft().currentScreen;
-                if(gui instanceof GuiExtremePatternEncoder) {
+                if(gui instanceof GuiExtremePatternEncoder && ((GuiExtremePatternEncoder) gui).avaritia != null) {
                     ((GuiExtremePatternEncoder) gui).avaritia.setIsChecked(true);
                 }
             }
