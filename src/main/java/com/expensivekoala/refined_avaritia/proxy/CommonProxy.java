@@ -2,10 +2,15 @@ package com.expensivekoala.refined_avaritia.proxy;
 
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.Registry;
+import com.expensivekoala.refined_avaritia.gui.ContainerExtremePatternEncoder;
 import com.expensivekoala.refined_avaritia.gui.handlers.GuiHandler;
+import com.expensivekoala.refined_avaritia.item.ItemExtremePattern;
 import com.expensivekoala.refined_avaritia.network.*;
 import com.expensivekoala.refined_avaritia.tile.TileExtremePatternEncoder;
+import com.raoulvdberge.refinedstorage.apiimpl.API;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -20,7 +25,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = RefinedAvaritia.MODID)
 public class CommonProxy {
     public void preInit(FMLPreInitializationEvent e) {
         int id = 0;
@@ -37,7 +42,18 @@ public class CommonProxy {
     }
 
     public void postInit(FMLPostInitializationEvent e) {
+        API.instance().addPatternRenderHandler(pattern -> {
+            Container container = Minecraft.getMinecraft().player.openContainer;
 
+            if(container instanceof ContainerExtremePatternEncoder) {
+                for (int i = 0; i < container.inventorySlots.size(); i++) {
+                    if(pattern == container.inventorySlots.get(i).getStack() && pattern.getItem() instanceof ItemExtremePattern) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
     }
 
     @SubscribeEvent

@@ -41,8 +41,9 @@ public class ExtremePattern implements ICraftingPattern {
         this.container = container;
         if (stack.hasTagCompound() && stack.getTagCompound().hasKey(ItemExtremePattern.NBT_TYPE)) {
             this.recipeType = ItemExtremePattern.getType(stack);
+        } else if (stack.hasTagCompound()) {
+            return;
         } else {
-            RefinedAvaritia.logger.warn("Assuming Avaritia recipe. If you see this message, remake your pattern. " + stack);
             this.recipeType = RecipeType.AVARITIA;
         }
         this.stack = stack;
