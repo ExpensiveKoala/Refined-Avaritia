@@ -2,13 +2,18 @@ package com.expensivekoala.refined_avaritia.jei;
 
 import com.expensivekoala.refined_avaritia.RefinedAvaritia;
 import com.expensivekoala.refined_avaritia.gui.ContainerExtremePatternEncoder;
+import com.expensivekoala.refined_avaritia.gui.GuiExtremePatternEncoder;
 import com.expensivekoala.refined_avaritia.network.MessageTransferAvaritiaRecipe;
+import com.expensivekoala.refined_avaritia.util.ExtendedCraftingUtil;
+import com.expensivekoala.refined_avaritia.util.RecipeType;
 import mezz.jei.api.gui.IGuiIngredient;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
 import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
 import morph.avaritia.recipe.AvaritiaRecipeManager;
 import morph.avaritia.recipe.extreme.IExtremeRecipe;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -21,7 +26,7 @@ import java.util.Map;
 /**
  * @author ExpensiveKoala
  */
-public class EncoderRecipeTransferHandler implements IRecipeTransferHandler<ContainerExtremePatternEncoder> {
+public class ECAdvancedEncoderRecipeTransferHandler implements IRecipeTransferHandler<ContainerExtremePatternEncoder> {
     @Override
     public Class<ContainerExtremePatternEncoder> getContainerClass() {
         return ContainerExtremePatternEncoder.class;
@@ -30,11 +35,11 @@ public class EncoderRecipeTransferHandler implements IRecipeTransferHandler<Cont
     @Nullable
     @Override
     public IRecipeTransferError transferRecipe(ContainerExtremePatternEncoder container, IRecipeLayout recipeLayout, EntityPlayer player, boolean maxTransfer, boolean doTransfer) {
-        if(doTransfer) {
+        if (doTransfer) {
             Map<Integer, ? extends IGuiIngredient<ItemStack>> guiIngredients = recipeLayout.getItemStacks().getGuiIngredients();
 
-            InventoryCrafting inventory = new InventoryCrafting(container, 9, 9);
-            NonNullList<ItemStack> items = NonNullList.withSize(81, ItemStack.EMPTY);
+            InventoryCrafting inventory = new InventoryCrafting(container, 5, 5);
+            NonNullList<ItemStack> items = NonNullList.withSize(5 * 5, ItemStack.EMPTY);
 
             for (Map.Entry<Integer, ? extends IGuiIngredient<ItemStack>> entry : guiIngredients.entrySet()) {
                 int recipeSlot = entry.getKey();
@@ -42,28 +47,26 @@ public class EncoderRecipeTransferHandler implements IRecipeTransferHandler<Cont
                 if (!allIngredients.isEmpty()) {
                     if (recipeSlot != 0) { // skip the output slot
                         ItemStack firstIngredient = allIngredients.get(0);
-                        inventory.setInventorySlotContents(recipeSlot-1, firstIngredient);
-                        items.set(recipeSlot-1, firstIngredient);
+                        inventory.setInventorySlotContents(recipeSlot - 1, firstIngredient);
+                        items.set(recipeSlot - 1, firstIngredient);
                     }
                 }
             }
-
-            IExtremeRecipe recipe = null;
-            for(IExtremeRecipe extremeRecipe :  AvaritiaRecipeManager.EXTREME_RECIPES.values()) {
-                if(extremeRecipe.matches(inventory, player.getEntityWorld())) {
-                    recipe = extremeRecipe;
-                    break;
+            container.getTile().setTableSize(ExtendedCraftingUtil.TableSize.ADVANCED);
+            container.getTile().setAvaritia(false);
+            if(player.world.isRemote) {
+                Gui gui = Minecraft.getMinecraft().currentScreen;
+                if(gui instanceof GuiExtremePatternEncoder) {
+                    ((GuiExtremePatternEncoder) gui).avaritia.setIsChecked(false);
                 }
             }
 
-            if(recipe != null) {
-                RefinedAvaritia.instance.network.sendToServer(
-                        new MessageTransferAvaritiaRecipe(
-                                container.getTile().getPos().getX(),
-                                container.getTile().getPos().getY(),
-                                container.getTile().getPos().getZ(),
-                                items));
-            }
+            RefinedAvaritia.instance.network.sendToServer(
+              new MessageTransferAvaritiaRecipe(
+                container.getTile().getPos().getX(),
+                container.getTile().getPos().getY(),
+                container.getTile().getPos().getZ(),
+                items, RecipeType.EC_ADVANCED));
         }
 
         return null;

@@ -37,7 +37,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
     TableSize selectedTable = TableSize.ULTIMATE;
     TileExtremePatternEncoder tile;
     GuiCheckBox oredictPattern;
-    GuiCheckBox avaritia;
+    public GuiCheckBox avaritia;
 
     public GuiExtremePatternEncoder(ContainerExtremePatternEncoder container, TileExtremePatternEncoder tile) {
         super(container);
