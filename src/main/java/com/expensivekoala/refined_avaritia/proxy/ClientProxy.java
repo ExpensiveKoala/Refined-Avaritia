@@ -11,6 +11,8 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber(modid = RefinedAvaritia.MODID)
 public class ClientProxy extends CommonProxy {
@@ -24,6 +26,7 @@ public class ClientProxy extends CommonProxy {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(Registry.EXTREME_PATTERN_ENCODER), 0, new ModelResourceLocation(Registry.EXTREME_PATTERN_ENCODER.getRegistryName(), "inventory"));
     }
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public static void onModelBakeEvent(ModelBakeEvent event) {
         IBakedModel existingModel =  event.getModelRegistry().getObject(new ModelResourceLocation(RefinedAvaritia.MODID + ":extreme_pattern", "inventory"));
