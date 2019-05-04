@@ -91,7 +91,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
     }
 
     private boolean isOverCreatePattern(int mouseX, int mouseY) {
-        return inBounds(200, 59, 16, 16, mouseX, mouseY) && tile.canCreatePattern();
+        return inBounds(200, 42, 16, 16, mouseX, mouseY) && tile.canCreatePattern();
     }
 
     private boolean isOverClear(int mouseX, int mouseY) {
@@ -220,7 +220,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
         if (tile != null && !tile.canCreatePattern())
             ty = 2;
 
-        drawTexture(guiLeft + 199, guiTop + 57, 240, ty * 16, 16, 16);
+        drawTexture(guiLeft + 199, guiTop + 42, 240, ty * 16, 16, 16);
 
         if (Loader.isModLoaded("extendedcrafting")) {
             if(avaritia != null && avaritia.isChecked()) {
