@@ -27,7 +27,7 @@ public class RefinedAvaritiaJEI implements IModPlugin {
             registry.getRecipeTransferRegistry().addRecipeTransferHandler(new ECEliteEncoderRecipeTransferHandler(), ECRecipeManagerWrapper.EXTREME_CRAFTING[2]);
             registry.getRecipeTransferRegistry().addRecipeTransferHandler(new ECUltimateEncoderRecipeTransferHandler(), ECRecipeManagerWrapper.EXTREME_CRAFTING[3]);
         }
-        registry.addRecipeClickArea(GuiExtremePatternEncoder.class, 175, 119, 24, 20, getRecipeCategories());
+        registry.addRecipeClickArea(GuiExtremePatternEncoder.class, 175, 99, 24, 20, getRecipeCategories());
     }
 
     private String[] getRecipeCategories() {

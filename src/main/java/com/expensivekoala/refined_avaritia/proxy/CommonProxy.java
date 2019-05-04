@@ -33,6 +33,7 @@ public class CommonProxy {
         RefinedAvaritia.instance.network.registerMessage(MessageClearExtremePattern.class, MessageClearExtremePattern.class, id++, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageSetOredictExtremePattern.class, MessageSetOredictExtremePattern.class, id++, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageSetAvaritiaPattern.class, MessageSetAvaritiaPattern.class, id++, Side.SERVER);
+        RefinedAvaritia.instance.network.registerMessage(MessageSetProcessingPattern.class, MessageSetProcessingPattern.class, id++, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageTransferAvaritiaRecipe.class, MessageTransferAvaritiaRecipe.class, id++, Side.SERVER);
         RefinedAvaritia.instance.network.registerMessage(MessageSetTableSize.class, MessageSetTableSize.class, id++, Side.SERVER);
     }

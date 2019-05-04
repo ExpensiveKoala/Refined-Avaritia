@@ -26,6 +26,7 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nullable;
 
 public class TileExtremePatternEncoder extends TileEntity {
+    private static final String NBT_PROCESSING_PATTERN = "Processing";
     private static final String NBT_OREDICT_PATTERN = "OredictPattern";
     private static final String NBT_AVARITIA_RECIPE = "AvaritiaRecipe";
     private static final String NBT_TABLE_SIZE = "TableSize";
@@ -34,6 +35,7 @@ public class TileExtremePatternEncoder extends TileEntity {
     private ItemHandlerRestricted recipe = new ItemHandlerRestricted(9 * 9);
     private ItemHandlerRestricted recipeOutput = new ItemHandlerRestricted(1);
 
+    private boolean processing;
     private boolean oredictPattern;
     private boolean avaritia;
     private TableSize tableSize;
@@ -61,6 +63,7 @@ public class TileExtremePatternEncoder extends TileEntity {
         oredictPattern = tag.getBoolean(NBT_OREDICT_PATTERN);
         tableSize = TableSize.values()[tag.getInteger(NBT_TABLE_SIZE)];
         avaritia = tag.getBoolean(NBT_AVARITIA_RECIPE);
+        processing = tag.getBoolean(NBT_PROCESSING_PATTERN);
     }
 
     @Override
@@ -69,6 +72,7 @@ public class TileExtremePatternEncoder extends TileEntity {
         tag.setBoolean(NBT_OREDICT_PATTERN, oredictPattern);
         tag.setInteger(NBT_TABLE_SIZE, tableSize.ordinal());
         tag.setBoolean(NBT_AVARITIA_RECIPE, avaritia);
+        tag.setBoolean(NBT_PROCESSING_PATTERN, processing);
         return tag;
     }
 
@@ -167,6 +171,14 @@ public class TileExtremePatternEncoder extends TileEntity {
             recipe.setStackInSlot(i, ItemStack.EMPTY);
         }
         onContentsChanged();
+    }
+
+    public boolean isProcessing() {
+        return processing;
+    }
+
+    public void setProcessing(boolean processing) {
+        this.processing = processing;
     }
 
     public boolean getOredictPattern() {

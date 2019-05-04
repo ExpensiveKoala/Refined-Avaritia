@@ -21,8 +21,8 @@ public class ContainerExtremePatternEncoder extends Container {
     public ContainerExtremePatternEncoder(TileExtremePatternEncoder tile, EntityPlayer player) {
         this.tile = tile;
         this.player = player;
-        addSlotToContainer(new SlotItemHandler(tile.getPatterns(), 0, 199, 21));
-        addSlotToContainer(new SlotItemHandler(tile.getPatterns(), 1, 199, 61) {
+        addSlotToContainer(new SlotItemHandler(tile.getPatterns(), 0, 199, 17));
+        addSlotToContainer(new SlotItemHandler(tile.getPatterns(), 1, 199, 57) {
             @Override
             public boolean isItemValid(@Nonnull ItemStack stack) {
                 return false;
@@ -43,7 +43,7 @@ public class ContainerExtremePatternEncoder extends Container {
         }
 
         //210, 121 addSlotToContainer()
-        addSlotToContainer(new SlotPhantom(tile.getRecipeOutput(), 0, 210, 106, true, tile));
+        addSlotToContainer(new SlotPhantom(tile.getRecipeOutput(), 0, 210, 101, true, tile));
         addPlayerInventory(39, 174);
         tile.onContentsChanged();
     }

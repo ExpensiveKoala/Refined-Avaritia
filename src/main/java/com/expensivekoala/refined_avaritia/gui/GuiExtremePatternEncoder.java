@@ -34,12 +34,14 @@ public class GuiExtremePatternEncoder extends GuiContainer {
 
     private static final String GUI_TEXTURE = "gui/extreme_pattern_encoder.png";
     private static final String GUI_BUTTON = "gui/button.png";
+    private static final String GUI_PROCESSING = "gui/processing_output.png";
 
     int screenWidth, screenHeight, lastButtonId;
     TableSize selectedTable = TableSize.ULTIMATE;
     TileExtremePatternEncoder tile;
     GuiCheckBox oredictPattern;
     public GuiCheckBox avaritia;
+    public GuiCheckBox processing;
 
     public GuiExtremePatternEncoder(ContainerExtremePatternEncoder container, TileExtremePatternEncoder tile) {
         super(container);
@@ -65,6 +67,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
                 tile.setTableSize(selectedTable);
             }
         }
+        processing = addCheckBox(guiLeft + 175, guiTop + 132, I18n.format("misc.refined_avaritia:processing"), tile.isProcessing());
         this.selectedTable = tile.getTableSize();
     }
 
@@ -91,7 +94,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
     }
 
     private boolean isOverCreatePattern(int mouseX, int mouseY) {
-        return inBounds(200, 42, 16, 16, mouseX, mouseY) && tile.canCreatePattern();
+        return inBounds(199, 38, 16, 16, mouseX, mouseY) && tile.canCreatePattern();
     }
 
     private boolean isOverClear(int mouseX, int mouseY) {
@@ -150,6 +153,11 @@ public class GuiExtremePatternEncoder extends GuiContainer {
                 tile.setTableSize(selectedTable);
             }
         }
+
+        if (button == processing) {
+            tile.setProcessing(processing.isChecked());
+            RefinedAvaritia.instance.network.sendToServer(new MessageSetProcessingPattern(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), processing.isChecked()));
+        }
     }
 
     @Override
@@ -201,8 +209,10 @@ public class GuiExtremePatternEncoder extends GuiContainer {
 
         bindTexture(RefinedAvaritia.MODID, GUI_TEXTURE);
 
+        //Draw main GUI
         drawTexture(guiLeft, guiTop, 0, 0, screenWidth, screenHeight);
 
+        //Draw recipe slots
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 9; y++) {
                 if (!slotEnabled(x, y)) {
@@ -211,7 +221,7 @@ public class GuiExtremePatternEncoder extends GuiContainer {
             }
         }
 
-
+        //Draw create pattern button
         int ty = 0;
 
         if (isOverCreatePattern(mouseX - guiLeft, mouseY - guiTop))
@@ -220,8 +230,15 @@ public class GuiExtremePatternEncoder extends GuiContainer {
         if (tile != null && !tile.canCreatePattern())
             ty = 2;
 
-        drawTexture(guiLeft + 199, guiTop + 42, 240, ty * 16, 16, 16);
+        drawTexture(guiLeft + 199, guiTop + 37, 240, ty * 16, 16, 16);
 
+        //Draw processing grid over output
+        if(tile != null && tile.isProcessing()) {
+            bindTexture(RefinedAvaritia.MODID, GUI_PROCESSING);
+            drawTexture(guiLeft + 176, guiTop + 76, 1, 1, 55, 54);
+        }
+
+        //Draw extended crafting size buttons
         if (Loader.isModLoaded("extendedcrafting")) {
             if(avaritia != null && avaritia.isChecked()) {
                 return;
